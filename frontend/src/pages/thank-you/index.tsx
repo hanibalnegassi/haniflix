@@ -66,9 +66,18 @@ const ThankYouPage = () => {
                     });
 
             }
+
+            const getQueryParams = () => {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    subscriptionId: params.get('sub'),
+                };
+            };
+
+            const { subscriptionId } = getQueryParams();
             axios
                 .post(api_url + "auth/v1/payment-success", {
-                    sessionId: session_id,
+                    subscriptionId: subscriptionId,
                     email,
                     password,
                     username,

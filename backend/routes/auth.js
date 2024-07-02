@@ -5,211 +5,212 @@ const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
 const dotenv = require("dotenv");
-// const SENDGRID_API_KEY =
-//   "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";
+
 const email_from = "Haniflix <no-reply@haniflix.com>";
 const { List } = require("../models/index");
-// const mongoose = require("mongoose")
-// const List = require("../models/List");
+
 
 dotenv.config();
-console.log("secret", process.env.STRIPE_SECRET_KEY);
-// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const Stripe = require("stripe");
-const stripeInstance = Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2022-11-15", // Replace with the desired API version
-});
-
-const demo_url = "https://haniflix.com/"; // "http://localhost:3000/";
+let paypalApiBaseUrl =process.env.PAYPAL_BASE_URL;
+const planId = process.env.PAYPAL_PLAN_ID;
+const paypalClientId = process.env.PAYPAL_CLIENT_ID;
+const paypalSecret = process.env.PAYPAL_SECRET;
+const appUrl = process.env.APP_URL; // "http://localhost:3000/";
 
 // sgMail.setApiKey(SENDGRID_API_KEY);
 
-const stripeSession = async (plan, user_email, user_password, username) => {
+const getPayPalAccessToken = async () => {
   try {
-    const session = await stripeInstance.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: plan,
-          quantity: 1,
-        },
-      ],
-      success_url: `https://haniflix.com/thank-you/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: "https://haniflix.com/register/cancelled=true",
-      metadata: {
-        user_email,
-        user_password,
-        username,
+    const response = await fetch(`${paypalApiBaseUrl}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${Buffer.from(`${paypalClientId}:${paypalSecret}`).toString("base64")}`,
       },
+      body: "grant_type=client_credentials",
     });
-    return session;
-  } catch (e) {
-    return e;
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PayPal access token: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error("Error fetching PayPal access token:", error);
+    throw new Error("Failed to fetch PayPal access token");
   }
 };
-router.post("/v1/create-subscription-checkout-session", async (req, res) => {
-  const { plan, customerId, email, username, password } = req.body;
 
-  console.log(req.body);
-  console.log("email", email);
-  // const emailExists = await User.find({ email: email });
-  const emailExists = await User.findOne({ email: req.body.email });
-  console.log("emailExists", emailExists);
-  if (emailExists) {
-    res.status(404).json({
-      error: true,
-      statusText: "This email already exists. Try another email",
-    });
-    return;
-  }
-  const usernameExists = await User.findOne({ username: username });
-  console.log("usernameExists", usernameExists);
-  if (usernameExists) {
-    res.status(404).json({
-      error: true,
-      statusText: "This username already exists. Try another username",
-    });
-    return;
-  }
+const createPayPalSubscription = async (accessToken, planId, email, username) => {
   try {
-    const session = await stripeSession(
-      "price_1PMqr5ELZYEDPohbO0e82vnc",
-      email,
-      password,
-      username
-    );
-    // const user = await admin.auth().getUser(customerId);
-    console.log("session", session);
-    return res.json({ session });
+    const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'PayPal-Request-Id': `SUBSCRIPTION-${new Date().toISOString().replace(/[^0-9]/g, '')}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        "plan_id": planId,
+        "subscriber": {
+          "email_address": email,
+          "name": {
+            "given_name": username, // Assuming username should be included in the name field
+          }
+          // Optionally, include shipping_address if needed
+        },
+        "application_context": {
+          "brand_name": "Haniflix",
+          "locale": "en-US",
+          "user_action": "SUBSCRIBE_NOW",
+          "return_url": `${appUrl}thank-you/?success=true`,
+          "cancel_url": `${appUrl}register/cancelled=true`,
+        }
+      })
+    });
+
+    const subscription = await response.json();
+
+
+    return subscription;
   } catch (error) {
-    res.send(error);
+    console.error("Error creating PayPal subscription:", error);
+    throw new Error("Failed to create PayPal subscription");
+  }
+};
+
+router.post("/v1/create-subscription-checkout-session", async (req, res) => {
+  const { email, username } = req.body;
+
+  try {
+    // Check if email already exists
+    const emailExists = await User.findOne({ email: email });
+    if (emailExists) {
+      return res.status(404).json({
+        error: true,
+        statusText: "This email already exists. Try another email",
+      });
+    }
+
+    // Check if username already exists
+    const usernameExists = await User.findOne({ username: username });
+    if (usernameExists) {
+      return res.status(404).json({
+        error: true,
+        statusText: "This username already exists. Try another username",
+      });
+    }
+
+    // If both email and username are unique
+    return res.status(200).json({
+      success: true,
+      statusText: "Both email and username are available",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      statusText: "An error occurred while checking the user information",
+    });
   }
 });
 
+// try {
+//
+//   const accessToken = await getPayPalAccessToken();
+//   const session = await createPayPalSubscription(accessToken, planId, email, username)
+//
+//   // const user = await admin.auth().getUser(customerId);
+//
+//   return res.json({ session });
+// } catch (error) {
+//   res.send(error);
+// }
 router.post("/v1/payment-success", async (req, res) => {
-  const { sessionId, email, password, username } = req.body;
-
-  console.log("body in success", req.body);
+  const { subscriptionId, email, password, username } = req.body;
 
   try {
-    const session = await stripeInstance.checkout.sessions.retrieve(sessionId);
-    const userExist = await User.findOne({
-      email: session.metadata.user_email,
+    // Retrieve PayPal subscription details
+    const accessToken = await getPayPalAccessToken();
+
+    // Fetch subscription details from PayPal API
+    const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${subscriptionId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+      }
     });
-    if (userExist && userExist.isSubscribed) {
-      console.log("User is subscribed already");
-      return res.json({ message: "User is subscribed already" });
+
+    // Handle HTTP errors
+    if (!response.ok) {
+      throw new Error(`Failed to retrieve PayPal subscription: ${response.status} - ${response.statusText}`);
     }
+
+    // Parse JSON response data
+    const subscription = await response.json();
+
+
+    // Check if user already exists
+    const userExist = await User.findOne({ email: email });
+
+    if (userExist && userExist.isSubscribed) {
+
+      return res.json({ message: "User is already subscribed" });
+    }
+
+    // Update existing user's subscription status if not subscribed
     if (userExist && !userExist.isSubscribed) {
-      console.log("User has been resubscribed");
+
       await User.findOneAndUpdate(
-        { email: session.metadata.user_email },
-        { isSubscribed: true }
+          { email: email },
+          { isSubscribed: true }
       );
       return res.json({ message: "User has been resubscribed" });
     }
-    console.log("session", session);
-    if (session.payment_status === "paid") {
-      const subscriptionId = session.subscription;
-      try {
-        const subscription = await stripeInstance.subscriptions.retrieve(
-          subscriptionId
-        );
-        console.log("subscription", subscription);
-        const newUser = await new User({
-          username: session.metadata.username,
-          email: session.metadata.user_email,
-          otp: CryptoJS.lib.WordArray.random(16),
-          password: CryptoJS.AES.encrypt(
-            session.metadata.user_password,
-            process.env.SECRET_KEY
-          ).toString(),
-          isSubscribed: true,
-          subscriptionId: subscription.id,
-          // old: username,
-          // old: email,
-        }).save();
-        // await newUser.save();
-        console.log("Newuser", newUser);
 
-        // TODO:Uncomment
-        const defaultList = new List({
-          title: `${console.log("email", email)}'s Watchlist`,
-          user: newUser._id,
-        });
+    // Create a new user if not exists and payment is successful
+    if (subscription.status === "APPROVAL_PENDING" || subscription.status === "ACTIVE") {
+      // Encrypt password and generate OTP
+      const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY).toString();
+      const otp = CryptoJS.lib.WordArray.random(16);
 
-        console.log("defaultList", defaultList);
+      // Create new user in the database
+      const newUser = await new User({
+        username,
+        email: email,
+        otp,
+        password: encryptedPassword,
+        isSubscribed: true,
+        subscriptionId: subscription.id,
+      }).save();
 
-        newUser.lists.push(defaultList._id);
-        newUser.defaultList = defaultList._id;
 
-        return res
-          .status(200)
-          .json({ message: "Payment successful", user: newUser });
 
-        // const { newUser, defaultList, user, err } = await registerUser(
-        //   email,
-        //   password,
-        //   username
-        // );
+      // Create default list for the user
+      const defaultList = new List({
+        title: `${email}'s Watchlist`,
+        user: newUser._id,
+      });
+      await defaultList.save();
 
-        // // Update user subscription status
+      // Update user's lists and defaultList
+      newUser.lists.push(defaultList._id);
+      newUser.defaultList = defaultList._id;
+      await newUser.save();
 
-        // console.log("newUser", newUser);
-        // console.log("user", user);
-        // newUser;
-        // await User.findByIdAndUpdate(
-        //   { _id: user._id },
-        //   { isSubscribed: true, subscriptionId: subscription.id }
-        // );
-
-        // const resUser = await User.findOne({ email });
-
-        // res.status(200).json({ resUser });
-        // console.log("newUser after", newUser);
-        // console.log("user after", user);
-        // const planId = subscription.plan.id;
-        // const planType = subscription.plan.amount === 50000 ? "basic" : "pro";
-        // const startDate = moment
-        //   .unix(subscription.current_period_start)
-        //   .format("YYYY-MM-DD");
-        // const endDate = moment
-        //   .unix(subscription.current_period_end)
-        //   .format("YYYY-MM-DD");
-        // const durationInSeconds =
-        //   subscription.current_period_end - subscription.current_period_start;
-        // const durationInDays = moment
-        //   .duration(durationInSeconds, "seconds")
-        //   .asDays();
-        // // await admin
-        // //   .database()
-        // //   .ref("users")
-        // //   .child(user.uid)
-        // console.log(
-        //   "planId",
-        //   planId,
-        //   "planType",
-        //   planType,
-        //   "planStartDate",
-        //   startDate,
-        //   "planEndDate",
-        //   endDate,
-        //   "planDuration",
-        //   durationInDays
-        // );
-      } catch (error) {
-        console.error("Error retrieving subscription:", error);
-      }
-      return res.json({ message: "Payment successful" });
+      return res.status(200).json({ message: "Payment successful", user: newUser });
     } else {
       return res.json({ message: "Payment failed" });
     }
   } catch (error) {
-    res.send(error);
+    console.error("Error retrieving subscription:", error);
+    res.status(500).send(error.message);
   }
 });
+
 
 router.get("/send-email", async (req, res) => {
   const msg = {
@@ -261,7 +262,7 @@ router.post("/register", async (req, res) => {
         });
       }
     } else {
-      console.log("New user does not exist");
+
       res.status(404).json({
         error: true,
         statusText:
@@ -508,26 +509,7 @@ router.post("/login", async (req, res) => {
       return;
     }
 
-    const subscription = await stripeInstance.subscriptions.retrieve(
-      user.subscriptionId
-    );
 
-    console.log(subscription);
-    if (subscription.status === "active") {
-      console.log("Subscription is active");
-      // return true;
-    }
-    if (subscription.status != "active") {
-      await User.findOneAndUpdate(
-        { email: userEmail },
-        { isSubscribed: false }
-      );
-      res.status(400).json({
-        message: "User subscription has expired",
-      });
-      return;
-    }
-    console.log(subscription);
     const bytes = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
     const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
 
@@ -536,6 +518,36 @@ router.post("/login", async (req, res) => {
         message: "Wrong password or username!",
       });
       return;
+    }
+
+    if (user.isAdmin === false) {
+
+      const accessTokenPP = await getPayPalAccessToken();
+      const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessTokenPP}`,
+          'Accept': 'application/json',
+        }
+      });
+      const subscription = await response.json();
+
+      if (!response.ok) {
+        throw new Error('Failed to retrieve PayPal subscription');
+      }
+
+      if (subscription.status !== 'ACTIVE') {
+        await User.findOneAndUpdate(
+            {email: userEmail},
+            {isSubscribed: false}
+        );
+        res.status(400).json({
+          message: "User subscription has expired or is inactive",
+        });
+        return;
+      }
+
     }
 
     const accessToken = jwt.sign(
@@ -556,7 +568,7 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({ ...info, accessToken, refreshToken });
   } catch (err) {
-    console.log("error ", err);
+
     res.status(400).json({
       message: err?.message ? err?.message : err,
     });

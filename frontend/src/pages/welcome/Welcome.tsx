@@ -172,7 +172,7 @@ export default function Welcome() {
         opacity: "0.5"
       }}></div> */}
         <div className={styles["get-started-section"]}>
-          <h1>Discover The  <span className="gradient-text">Ultimate </span>Streaming Service</h1>
+          <h1>Discover The  <span className="gradient-text">ULTIMATE </span>Streaming Service</h1>
           <br />
 
           <button
@@ -195,11 +195,11 @@ export default function Welcome() {
               Unlimited <span className="gradient-text"> • </span> Ad-Free <span className="gradient-text"> • </span>  Award-Winning <span className="gradient-text"> • </span>  4K Movies & TV Shows <span className="gradient-text"> FOR ONLY 99₵/MONTH</span>
               <br />
               <br />
-              Join <span className="gradient-text"> 1M+ Satisfied</span>  Users
+              Join <span className="gradient-text"> 20M+ SATISFIED </span> Users
 
               <br />
               <br />
-              Enjoy <span className="gradient-text">1 Month Free Trial</span>
+              Enjoy <span className="gradient-text">1 MONTH FREE TRIAL </span>
             </h1>
           </div>
 
@@ -249,7 +249,7 @@ export default function Welcome() {
 
 
           <center>
-            <h1  className="font-semibold"><span className="gradient-text">Popular </span></h1>
+            <h1  className="font-semibold"><span className="gradient-text">POPULAR </span></h1>
           </center>
           <div style={{
             maxWidth: "1120px",
@@ -263,7 +263,7 @@ export default function Welcome() {
 
 
           <center>
-            <h1  className="font-semibold">See What Our  <span className="gradient-text">Users </span>Are Saying</h1>
+            <h1  className="font-semibold">See What  <span className="gradient-text">20M+ SATISFIED USERS </span>Are Saying</h1>
           </center>
 
 
@@ -289,7 +289,7 @@ export default function Welcome() {
 
 
           <center>
-            <h1  className="font-semibold">Frequently Ask <span className="gradient-text">Questions </span></h1>
+            <h1  className="font-semibold">Frequently Ask <span className="gradient-text">QUESTIONS </span></h1>
           </center>
 
 
