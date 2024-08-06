@@ -43,7 +43,7 @@ export default function ModelPopup({ children }) {
         animate="visible"
         exit="hidden"
         variants={modelVariant}
-        className="modalpopbg absolute left-1/2 top-1/2 -translate-x-1/2 bg-slate-950/[.9] -translate-y-1/2 sm:min-w-96 p-10 text-center  bg-dark2  flex flex-col justify-center min-h-52 backdrop-blur-lg rounded-xl max-w-[95vw]"
+        className="modalpopbg absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:min-w-96 p-10 text-center flex flex-col justify-center min-h-52 backdrop-blur-lg rounded-xl max-w-[95vw]"
       >
         {children}
       </motion.div>

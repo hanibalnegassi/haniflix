@@ -1,73 +1,28 @@
-const path = require("path");
-const fs = require("fs");
-
 const { Movie } = require("../../models");
-
-// Function to get the base path for movies
-const getBasePath = () => {
-  return process.env.IS_IN_DOCKER === "is_docker"
-    ? "/usr/movies"
-    : path.resolve(__dirname, "..", "..", "../../test videos");
-  // : path.join(__dirname, "..", "..", "test_videos");
-};
 
 const streamMovie = async (req, res) => {
   try {
-    const NODE_ENV = process.env.NODE_ENV;
     const movieId = req.params.movieId;
+    const movieData = await Movie.findById(movieId);
 
-    let videoFileName;
-
-    if (process.env.IS_IN_DOCKER === "is_docker") {
-      const movieData = await Movie.findById(movieId);
-
-      // Strip the CDN URL from the video URL
-      const videoUrl = movieData.video.replace(
-        "https://cdn.haniflix.com/movies/",
-        ""
-      );
-      // Extract the file name from the URL
-      videoFileName = decodeURIComponent(videoUrl);
-    } else {
-      // Default to sample movie in development
-      videoFileName =
-        "21 Jump Street (2012) [1080p]/21.Jump.Street.2012.1080p.BluRay.x264.YIFY.mov";
+    if (!movieData) {
+      return res.status(404).send({ message: "Movie not found" });
     }
 
-    const videoPath = path.join(getBasePath(), videoFileName);
+    // Assuming the video field contains the full S3 URL
+    const videoUrl = movieData.video;
 
-    const stat = fs.statSync(videoPath);
-    const fileSize = stat.size;
-
-    const range = req.headers.range;
-    // console.log("range ", range);
-
-    if (range) {
-      const parts = range.replace(/bytes=/, "").split("-");
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunksize = end - start + 1;
-      const file = fs.createReadStream(videoPath, { start, end });
-
-      res.writeHead(206, {
-        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-        "Accept-Ranges": "bytes",
-        "Content-Length": chunksize,
-        "Content-Type": "video/mp4",
-      });
-
-      file.pipe(res);
-    } else {
-      res.writeHead(200, {
-        "Content-Length": fileSize,
-        "Content-Type": "video/mp4",
-      });
-
-      fs.createReadStream(videoPath).pipe(res);
+    // Check if videoUrl exists
+    if (!videoUrl) {
+      return res.status(404).send({ message: "Video URL not found" });
     }
+
+    // Redirect the client to the S3 URL
+    res.redirect(videoUrl);
   } catch (error) {
+    console.error("Error streaming movie:", error);
     res.status(500).send({
-      message: "error streaming movie",
+      message: "Error streaming movie",
       error,
     });
   }

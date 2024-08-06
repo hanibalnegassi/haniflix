@@ -610,7 +610,7 @@ export default function MovieListItem({
           <div style={{ maxWidth: "900px", margin: "auto" }} className="w-full h-full relative z-[6] overflow-y-auto CustomScroller">
             <AnimatePresence>
               <div
-                className={`w-full h-fit rounded-2xl  flex-shrink-0 py-10 px-4 xl:px-8 flex flex-col gap-5`}
+                className={`w-full  rounded-2xl  flex-shrink-0 py-10 px-4 xl:px-8 flex flex-col gap-5`}
               >
                 <MovieDetailPanel
                   type={"Movie"}

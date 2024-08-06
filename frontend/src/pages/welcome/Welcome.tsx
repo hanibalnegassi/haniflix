@@ -18,7 +18,7 @@ import AppAccordion from "./AppAccordion";
 import { MdPeopleAlt } from "react-icons/md";
 import { PiTiktokLogoFill } from "react-icons/pi";
 
-import { PiTwitterLogoFill } from "react-icons/pi";
+import { PiXLogoFill } from "react-icons/pi";
 import { PiInstagramLogoFill } from "react-icons/pi";
 import { FaFacebookF } from "react-icons/fa";
 import CustomButton from "../../components/GradientButton";
@@ -112,7 +112,7 @@ export default function Welcome() {
 
   const socialIcons = [
     { Icon: PiTiktokLogoFill, url: '#' },
-    { Icon: PiTwitterLogoFill, url: '#' },
+    { Icon: PiXLogoFill, url: '#' },
     { Icon: PiInstagramLogoFill, url: '#' },
     { Icon: FaFacebookF, url: '#' }
   ];

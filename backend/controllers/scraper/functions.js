@@ -2,10 +2,11 @@ const puppeteer = require("puppeteer");
 const { Movie } = require("../../models");
 const Genre = require("../../models/Genre");
 const Logger = require("../../lib/logger");
+const mongoose = require('mongoose'); // Import mongoose
 
 const DELAY_AFTER_MOVIES = 2;
 const BATCH_SIZE = 5;
-const SEARCH_PAGE_URL = "https://reelgood.com/";
+const SEARCH_PAGE_URL = "https://yts.mx/";
 
 let pageInstanceForMultiple;
 let browser;
@@ -19,7 +20,7 @@ async function initBrowser() {
       protocolTimeout: 5 * 60 * 1000,
     });
   } catch (error) {
-    Logger.error(`Error while initializing browser: ${error}`);
+    Logger.error(`Error while initializing browser: ${error.message}`);
   }
 }
 
@@ -30,22 +31,22 @@ async function closeBrowser() {
       browser = undefined;
     }
   } catch (error) {
-    Logger.error(`Error while closing browser: ${error}`);
+    Logger.error(`Error while closing browser: ${error.message}`);
   }
 }
 
 const checkPageIsReady = async (page) => {
   try {
-    await page.waitForSelector('input[data-testid="search-input"]');
-    await page.type('input[data-testid="search-input"]', "dummy text");
+    await page.waitForSelector('#quick-search-input');
+    await page.type('#quick-search-input', "dummy text");
     await page.evaluate(() => {
-      document.querySelector('input[data-testid="search-input"]').value = "";
+      document.querySelector('#quick-search-input').value = "";
     });
     await page.waitForFunction(
-      'document.querySelector(\'input[data-testid="search-input"]\').value === ""'
+      'document.querySelector(\'#quick-search-input\').value === ""'
     );
   } catch (error) {
-    Logger.error(`Error in checkPageIsReady: ${error}`);
+    Logger.error(`Error in checkPageIsReady: ${error.message}`);
   }
 };
 
@@ -75,37 +76,21 @@ async function scrapeMovieDetails({ _page, url }) {
     }
 
     const movieDetails = await page.$eval("body", (body) => {
-      // Scrape the required data
-      let yearOfRelease = body.querySelector(".e1dskkhw7.css-1i5l3f2.e83cah30")?.textContent;
-      yearOfRelease = yearOfRelease?.replace("(", "")?.replace(")", "");
-      const title = body.querySelector(".css-hiz1q1.e3s42hj0")?.textContent;
-
-      let fullDescription = body.querySelector(".css-49lcwn.e1qij4j11 p")?.textContent;
-      let movieDescParts = fullDescription?.includes(`${title} featuring`)
-        ? fullDescription?.split(`${title} featuring`)
-        : fullDescription?.split(title);
-      let description = movieDescParts[0]?.trim();
-
-      let ageRating = body.querySelector(".css-si6acb.eytn0nr3")?.textContent;
-
-      const genreDiv = body.querySelector(".css-swt64r.ex9d9ik0");
-      let genre = [];
-      if (genreDiv) {
-        const links = genreDiv.querySelectorAll("a");
-        const filteredLinks = Array.from(links).filter(link => link.getAttribute('href').startsWith('/movies/genre'));
-
-        for (let i = 0; i < Math.min(filteredLinks.length, 2); i++) {
-          genre.push(filteredLinks[i].textContent);
-        }
-      }
-
-      const duration = body.querySelector(".css-1r35rcf.e1dskkhw11")?.textContent;
-      const imageUrl = body.querySelector(".eytn0nr13 .css-18pmxw3.edbh37f1")?.src;
-      let largestImageUrl = imageUrl?.replace(/poster-\d+/, "backdrop-1280");
+      const title = body.querySelector("#movie-info .hidden-xs h1")?.textContent.trim();
+      const yearOfRelease = body.querySelector("#movie-info .hidden-xs h2:nth-of-type(1)")?.textContent.trim();
+      const genreText = body.querySelector("#movie-info .hidden-xs h2:nth-of-type(2)")?.textContent.trim();
+      const fullDescription = body.querySelector("#synopsis p")?.textContent.trim();
+      const ageRatingDiv = body.querySelector('.tech-spec-element.col-xs-20.col-sm-10.col-md-5 span[title="MPA Rating"]').parentElement;
+      const ageRating = ageRatingDiv.childNodes[2].nodeValue.trim();
+      const durationElement = body.querySelector('.tech-spec-element .icon-clock').parentElement;
+      const duration = durationElement.textContent.trim();
+      const imageUrl = body.querySelector("#movie-poster img")?.src || "";
+      const largestImageUrl = body.querySelector('a.youtube#playTrailer')?.href || "";
+      const genre = genreText ? genreText.split(' / ').map(g => g.trim()) : [];
 
       return {
         title,
-        description,
+        description: fullDescription,
         imageUrl,
         largestImageUrl,
         ageRating,
@@ -117,7 +102,7 @@ async function scrapeMovieDetails({ _page, url }) {
 
     return movieDetails;
   } catch (error) {
-    Logger.error(`Error scraping movie details: ${error}`);
+    Logger.error(`Error scraping movie details: ${error.message}`);
     return {};
   } finally {
     if (!_page) {
@@ -128,6 +113,7 @@ async function scrapeMovieDetails({ _page, url }) {
     }
   }
 }
+
 async function searchAndScrapeMovies(
   movieInfos,
   io,
@@ -141,9 +127,9 @@ async function searchAndScrapeMovies(
   let stopProcess = _stopProcess;
   let countInCurrentBatch = 0;
   const processedMoviesData = [];
-  page = pageInstanceForMultiple;
+  let page = pageInstanceForMultiple;
 
-  console.log("Function Staretd")
+  console.log("Function Started")
 
   setCallBack({});
 
@@ -177,7 +163,7 @@ async function searchAndScrapeMovies(
           cdnUrlMovieName: movieInfo.movieName,
         });
       }
-      await page.$eval('input[data-testid="search-input"]', (input) => (input.value = ""));
+      await page.$eval('#quick-search-input', (input) => (input.value = ""));
     };
 
     for (const movieInfo of movieInfos) {
@@ -195,7 +181,16 @@ async function searchAndScrapeMovies(
             break;
           }
 
-          addedMovie = processedMoviesData.find((processedMovieData) => processedMovieData.movieId == movieInfo.movieId);
+          // Cast movieId to ObjectId
+          let movieObjectId;
+          try {
+            movieObjectId = new mongoose.Types.ObjectId(movieInfo.movieId);
+          } catch (castError) {
+            Logger.error(`Invalid ObjectId: ${movieInfo.movieId}`);
+            continue;
+          }
+
+          addedMovie = processedMoviesData.find((processedMovieData) => processedMovieData.movieId.toString() === movieObjectId.toString());
 
           if (addedMovie) {
             let genreIds = [];
@@ -228,10 +223,14 @@ async function searchAndScrapeMovies(
             const allMovieWordsIncluded = cdnUrlMovieName.trim().split(" ").every((word) => pulledMovieName.includes(word));
 
             if (!allMovieWordsIncluded) {
-              throw { message: "DB movie details not matching with pulled data" };
+              throw new Error("DB movie details not matching with pulled data");
             }
 
-            let updatedMovie = await Movie.findByIdAndUpdate(addedMovie.movieId, { $set: newFields }, { new: true });
+            let updatedMovie = await Movie.findByIdAndUpdate(
+              movieObjectId, // Use the ObjectId instance
+              { $set: newFields },
+              { new: true }
+            );
             if (updatedMovie.failedDuringScrape == true) {
               updatedMovie = await Movie.findByIdAndUpdate(updatedMovie._id, { $unset: { failedDuringScrape: "" } });
             }
@@ -245,7 +244,7 @@ async function searchAndScrapeMovies(
             movie: { title: movieInfo.movieName, success: !!addedMovie, retryCount: retryCount },
           });
         } catch (error) {
-          Logger.error(`Error processing movie: ${movieInfo.movieName}`);
+          Logger.error(`Error processing movie: ${movieInfo.movieName}, Error: ${error.message}`);
           Logger.info(`Retry count for movie: ${movieInfo.movieId} is ${retryCount}`);
 
           setProcessedCount(currentCount + countInCurrentBatch);
@@ -255,15 +254,21 @@ async function searchAndScrapeMovies(
             movie: { title: movieInfo.movieName, success: false, retryCount: retryCount },
           });
 
-          if (retryCount == RETRY_ATTEMPTS - 1) {
-            await Movie.findByIdAndUpdate(movieInfo.movieId, { $set: { failedDuringScrape: true } }, { new: true });
+          try {
+            let movieObjectId = new mongoose.Types.ObjectId(movieInfo.movieId);
+            if (retryCount == RETRY_ATTEMPTS - 1) {
+              await Movie.findByIdAndUpdate(movieObjectId, { $set: { failedDuringScrape: true } }, { new: true });
+            }
+          } catch (castError) {
+            Logger.error(`Failed to update failedDuringScrape: ${castError.message}`);
           }
+
           retryCount++;
         }
       }
     }
   } catch (error) {
-    Logger.error(`error in browser: ${JSON.stringify(error)}`);
+    Logger.error(`error in browser: ${JSON.stringify(error.message)}`);
 
     if (error.name === "ProtocolError" || error.name === "TargetCloseError") {
       Logger.warn(`${error.name}, relaunching browser...`);
@@ -279,76 +284,72 @@ async function searchAndScrapeMovies(
 }
 
 async function searchAndScrapeMovie(page, movieName, movieYear) {
-  try {
-    const isInputFilled = await page.$eval('input[data-testid="search-input"]', (input) => input.value.trim() !== "");
-
-    if (isInputFilled) {
-      await page.$eval('input[data-testid="search-input"]', (input) => (input.value = ""));
-    }
-
-    for (let retries = 0; retries < 3; retries++) {
-      try {
-        await page.type('input[data-testid="search-input"]', `${movieName} ${movieYear}`);
-        await new Promise((r) => setTimeout(r, 1500));
-
-        const actualValue = await page.$eval('input[data-testid="search-input"]', (input) => input.value.trim());
-        if (actualValue !== "") {
-          break;
-        } else {
-          await new Promise((r) => setTimeout(r, 2000));
-        }
-      } catch (error) {
-        Logger.error(`Error typing search term: ${error}`);
+    try {
+      // Clear any pre-filled text in the search input
+      const isInputFilled = await page.$eval('#quick-search-input', (input) => input.value.trim() !== "");
+      if (isInputFilled) {
+        await page.$eval('#quick-search-input', (input) => (input.value = ""));
       }
+  
+      // Type the movie name and year into the search input
+      await page.type('#quick-search-input', `${movieName} ${movieYear}`);
+      await page.keyboard.press('Enter'); // Trigger the search
+  
+      // Wait for the dropdown results to load
+      await new Promise(resolve => setTimeout(resolve, 1500));
+  
+      // Wait for the dropdown results to appear
+      await page.waitForSelector('ul > li.ac-item-hover', { timeout: 60 * 1000 });
+  
+      // Extract the dropdown results
+      const resultLinks = await page.$$eval('ul > li.ac-item-hover a', (links) =>
+        links.map((link) => ({
+          title: link.querySelector('span').textContent,
+          href: link.getAttribute("href"),
+          year: link.querySelector('p').textContent
+        }))
+      );
+  
+      if (resultLinks.length === 0) {
+        throw new Error("No results found in the search.");
+      }
+  
+      Logger.info(`Found ${resultLinks.length} results for ${movieName}`);
+  
+      // Find the matching result
+      const matchingResult = resultLinks.find((link) => {
+        const sanitizedTitle = link.title.replace(/[^\w\s]/gi, "").toLowerCase();
+        const sanitizedMovieName = movieName.replace(/[^\w\s]/gi, "").toLowerCase();
+        const allWordsIncluded = sanitizedMovieName.split(" ").every((word) => sanitizedTitle.includes(word));
+        const matchesYear = link.year.includes(movieYear);
+  
+        return allWordsIncluded && matchesYear;
+      });
+  
+      if (!matchingResult) {
+        Logger.error(`No matching result found for ${movieName} (${movieYear})`);
+        throw new Error("No matching result found.");
+      }
+  
+      // Navigate to the matched movie's page
+      await Promise.all([
+        page.waitForNavigation({ waitUntil: ["domcontentloaded", "load", "networkidle2"], timeout: 60 * 1000 * 2 }),
+        page.goto(matchingResult.href),
+      ]);
+  
+      await checkPageIsReady(page);
+      await page.waitForSelector("#movie-info", { timeout: 60 * 1000 * 2 });
+  
+      // Scrape the movie details
+      const movieDetails = await scrapeMovieDetails({ _page: page });
+  
+      return movieDetails;
+    } catch (error) {
+      Logger.error(`Error searching and scraping movie: ${error.message}`);
+      throw error;
     }
-
-    const actualValue = await page.$eval('input[data-testid="search-input"]', (input) => input.value.trim());
-    if (actualValue === "") {
-      throw { message: "Input field is empty after retries" };
-    }
-
-    await page.waitForSelector("#search_dropdown_results", { timeout: 60 * 1000 * 2 });
-    await page.waitForSelector("#search_dropdown_results a", { timeout: 60 * 1000 * 2 });
-
-    const resultLinks = await page.$$eval("#search_dropdown_results a", (links) =>
-      links.map((link) => ({
-        title: link.getAttribute("title"),
-        href: link.getAttribute("href"),
-        titleWithYear: link.querySelector(".css-bddqzz.e121vwr03").textContent.trim(),
-      }))
-    );
-
-    const matchingResult = resultLinks.find((link) => {
-      const title = link.title.toLowerCase();
-      const titleWithYear = link.titleWithYear.toLowerCase();
-      const sanitizedTitle = title.replace(/[^\w\s]/gi, "");
-      const sanitizedMovieName = movieName.replace(/[^\w\s]/gi, "").toLowerCase();
-      const allWordsIncluded = sanitizedMovieName.split(" ").every((word) => sanitizedTitle.includes(word));
-      const matchesYear = link.href.includes(movieYear) || titleWithYear.includes(`(${movieYear.trim()})`);
-
-      return allWordsIncluded && matchesYear;
-    });
-
-    if (!matchingResult) {
-      throw { message: "No matching result found." };
-    }
-
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: ["domcontentloaded", "load", "networkidle2"], timeout: 60 * 1000 * 2 }),
-      page.goto(`${SEARCH_PAGE_URL}${matchingResult.href}`),
-    ]);
-
-    await checkPageIsReady(page);
-    await page.waitForSelector(".css-hiz1q1.e3s42hj0", { timeout: 60 * 1000 * 2 });
-
-    const movieDetails = await scrapeMovieDetails({ _page: page });
-
-    return movieDetails;
-  } catch (error) {
-    Logger.error(`Error searching and scraping movie: ${error}`);
-    throw error;
   }
-}
+  
 
 module.exports = {
   scrapeMovieDetails,

@@ -216,14 +216,16 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
       exit="exit"
       variants={tabVariant}
       transition={parentTransition}
-      className="flex flex-col gap-5 relative z-10">
+      className="flex flex-col gap-5 relative z-10"
+      style={{ height: '40em' }} 
+>
+     
 
 
-
-      <img
+      <iframe
         src={movieToShow?.imgTitle}
-        style={{ width: '100%', maxHeight: "400px", objectFit: "cover" }}
-      />
+        style={{ width: '100%', height: "100%", objectFit: "cover" }}
+      ></iframe>
       <p className="text-base ">{movieToShow?.title}</p>
 
       {movieToShow && (

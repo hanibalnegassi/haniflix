@@ -25,23 +25,36 @@ const webhookRoute = require("./routes/webhook");
 
 // Allowed origins for CORS
 const allowed_origins = [
-  "http://50.62.182.51:4000",
-  "http://admin.haniflix.com:4000",
   "https://admin.haniflix.com",
+  "http://admin.haniflix.com",
   "https://haniflix.com",
+  "http://haniflix.com",
   "https://www.haniflix.com",
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "http://localhost:5174",
+  "http://www.haniflix.com",
 ];
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowed_origins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+  credentials: true
+};
 
 // Express app and server setup
 const app = express();
+
 const server = http.createServer(app);
+
 const io = socketio(server, {
   cors: {
     origin: allowed_origins,
-    methods: ["GET", "POST", "PUT"],
+    methods: ["GET", "POST"],
     allowedHeaders: ["token"],
     credentials: true,
   },
@@ -52,15 +65,16 @@ const connectDB = require("./startup/db");
 connectDB();
 
 // Server port
-const PORT = process.env.PORT || 8800;
+const PORT = process.env.PORT || 8000;
 
-// CORS setup
-app.options("*", cors({ origin: allowed_origins, optionsSuccessStatus: 200 }));
-app.use(cors({ origin: allowed_origins, optionsSuccessStatus: 200 }));
+
+
+// Apply CORS middleware before routes
+app.use(cors(corsOptions));
 
 // Logging middleware
-app.use(morgan('tiny')); // Use only one morgan middleware
-app.use(morganMiddleware); // Assuming this has additional customization
+app.use(morgan('tiny')); // Standard logging
+app.use(morganMiddleware); // Custom logging
 
 // JSON parsing middleware
 app.use(express.json());
