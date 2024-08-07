@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// const Movie = require("./Movie");
 const Genre = require("./Genre");
 // const List = require("./List");
 
@@ -27,6 +26,8 @@ const addHooks = ({ MovieSchema, ListSchema }) => {
   ListSchema.pre(["save", "findOneAndUpdate"], async function () {
     try {
       // Retrieve the previous state of the document from the database
+
+      console.log("i am inside pre hook")
       if (this.isNew) {
         this._previousState = null; // If it's a new document, set previous state to null
       } else {
@@ -43,6 +44,8 @@ const addHooks = ({ MovieSchema, ListSchema }) => {
   // Listener to add movies to lists based on list title changes
   ListSchema.post(["save", "findOneAndUpdate"], async function (list) {
     try {
+
+      console.log("i am inside post hook")
       const previousState = this._previousState;
 
       // console.log("this ", this);
@@ -58,6 +61,8 @@ const addHooks = ({ MovieSchema, ListSchema }) => {
       const newTitle = list.title.toLowerCase()?.trim();
       const oldTitle = previousState?.title?.toLowerCase()?.trim();
 
+      console.log("new title", newTitle)
+      console.log("old title", oldTitle)
       if (oldTitle !== newTitle) {
         // Find movies with genres matching the list title
         const listTitleLowercase = list.title.toLowerCase()?.trim();
@@ -89,7 +94,12 @@ const addHooks = ({ MovieSchema, ListSchema }) => {
   // Listener to add or remove movies from lists based on genre changes
   MovieSchema.post(["save", "findOneAndUpdate"], async function (movie) {
     try {
-      const populatedMovie = await movie.populate("genre").execPopulate();
+      console.log("movie issss", movie)
+      const Movie = mongoose.model("Movie", MovieSchema);
+      const populatedMovie = await Movie.findOne({_id: movie._id}).populate("genre").lean().exec();
+
+      console.log("populatedMovie", populatedMovie)
+
 
       const genresTitles = populatedMovie.genre.map((genre) => genre.title);
 

@@ -7,6 +7,14 @@
     background: url("/images/home0.jpeg") repeat center center;
     background-size: cover;
 
+    .navbar {
+        position: fixed; /* This makes the navbar fixed */
+        top: 0;          /* Positions the navbar at the top of the viewport */
+        width: 95%;     /* Ensures the navbar spans the full width of the viewport */
+        z-index: 10;     /* Ensures the navbar stays above other content */
+        background-color: black;
+      }
+
 
     @media (max-width: 768px) {
         background: url("/images/mbhome.jpg");
@@ -228,6 +236,9 @@
         transform: translate(-20%, -10%) rotate(360deg);
     }
 }
+
+
+
 
 
 

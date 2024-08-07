@@ -272,9 +272,9 @@ function Movies() {
                         color: lastMovieProcessed?.success == true ? 'green' : 'red'
                       }}>{lastMovieProcessed?.success?.toString()}</span>
                       </div>
-                      <div
+                      {/* <div
                       >Retries: <span >{lastMovieProcessed?.retryCount}</span>
-                      </div>
+                      </div> */}
                     </>
                     : undefined
                   }

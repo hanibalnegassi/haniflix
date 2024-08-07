@@ -354,7 +354,7 @@ const HomeNew = ({ type = null }) => {
                                 className={`w-full h-fit flex-grow flex-shrink rounded-2xl p-6 xl:p-10 flex flex-col gap-4 sm:gap-6 xl:gap-5`}
                             >
 
-                                <div className="flex gap-2 flex-col md:flex-row sm:flex-row justify-between relative z-10">
+                                <div className="navbar flex gap-2 flex-col md:flex-row sm:flex-row justify-between relative z-10">
                                     <div className="flex gap-6 items-center">
                                         <button onClick={handleLogoutClick} onTouchStart={(e) => { e.preventDefault(); handleLogoutClick(); }}>
                                             <Icon name={"Logout"} hovered={showLogout} />
