@@ -7,6 +7,16 @@
     background: url("/images/home0.jpeg") repeat center center;
     background-size: cover;
 
+
+  .list-container {
+    margin-top: 2rem;
+
+    @media screen and (max-width: 700px) {
+
+        margin-top:6rem;
+    }
+  }
+
     .navbar {
         position: fixed; /* This makes the navbar fixed */
         top: 0;          /* Positions the navbar at the top of the viewport */

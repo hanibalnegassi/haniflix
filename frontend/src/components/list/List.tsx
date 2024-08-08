@@ -79,7 +79,7 @@ const List: React.FC<ListProps> = ({
     onPlayMovie?.(movie, axis);
   };
 
-  const containerClass = `${styles['list-container']} flex justify-between gap-5 mb-2 xl:mb-5`
+  const containerClass = `flex justify-between gap-5 mb-2 xl:mb-5`
   return (
     <>
       {list?.content?.length > 0 && <div className={styles["list"]}>
