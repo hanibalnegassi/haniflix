@@ -102,11 +102,32 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
 
+
   &:hover {
     background-color: #EA1B1B30;
   }
 }
+.theme_button_danger_aligned {
+  width: fit-content;
+  padding: 0 22px;
+  min-width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #EA1B1B10;
+  color: #EA1B1B;
+  border: 2px solid #EA1B1B60;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  right: 54rem;
 
+
+  &:hover {
+    background-color: #EA1B1B30;
+  }
+}
 .theme_button {
   background-color: #00805A;
   color: #fff;
@@ -129,5 +150,12 @@ body {
 
   &:hover {
     background-color: #13B8A6;
+  }
+}
+@media (max-width: 768px) {
+  .theme_button_danger_aligned {
+    position: relative;
+    left: 15rem!important;
+    bottom: 1rem!important;
   }
 }
