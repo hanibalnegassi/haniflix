@@ -53,7 +53,6 @@ const List: React.FC<ListProps> = ({
 
   const carouselRef = useRef();
 
-  debugger
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -88,7 +87,6 @@ const List: React.FC<ListProps> = ({
 
   const genre = genres.find(g => g.title === list?.title.toLowerCase())
 
-  debugger
   return (
     <>
       {list?.content?.length > 0 && <div className={styles["list"]}>
