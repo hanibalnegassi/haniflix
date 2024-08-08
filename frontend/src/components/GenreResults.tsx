@@ -88,9 +88,9 @@ const GenreResults = () => {
   };
 
 
-  if (genresError || moviesError) {
-    return <div>Error loading data</div>;
-  }
+  // if (genresError || moviesError) {
+  //   return <div>Error loading data</div>;
+  // }
 
   const onClickPlayMovie = (movie: Movie, axis: any) => {
     onPlayMovie?.(movie, axis);
