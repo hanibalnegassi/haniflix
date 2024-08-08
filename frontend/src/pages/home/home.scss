@@ -20,7 +20,7 @@
     .navbar {
         position: fixed; /* This makes the navbar fixed */
         top: 0;          /* Positions the navbar at the top of the viewport */
-        width: 95%;     /* Ensures the navbar spans the full width of the viewport */
+        width: 100%;     /* Ensures the navbar spans the full width of the viewport */
         z-index: 10;     /* Ensures the navbar stays above other content */
         backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
         --tw-backdrop-blur: blur(16px);
@@ -32,6 +32,16 @@
         background-size: cover;
     }
 
+}
+.nav_align1{
+    margin-left: 3rem;
+}
+@media (max-width: 768px) {
+    .nav_align1{
+        margin-left: 2rem;
+        margin-top: 0.5rem;
+
+    }
 }
 #background_wrap {
     z-index: -1;
@@ -199,6 +209,7 @@
     border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
     border-image-slice: 1;
     background-color: transparent !important;
+    margin-right: 3rem;
 }
 
 .inputWrapperHover {
@@ -211,6 +222,8 @@
         border: 2px solid;
         border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
         border-image-slice: 1;
+        margin-left: 1.9rem;
+        margin-bottom: 0.5rem;
         background-color: transparent !important;
     }
 }
