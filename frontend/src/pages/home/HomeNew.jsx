@@ -356,14 +356,7 @@ const HomeNew = ({ type = null }) => {
                         className={`${centerPanelSize} h-[calc(100vh-20px)] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden`}
                     >
 
-
-                        <div className="w-full h-full relative z-[1] overflow-y-scroll CustomScroller">
-
-                            <div
-                                className={`w-full h-fit flex-grow flex-shrink rounded-2xl p-6 xl:p-10 flex flex-col gap-4 sm:gap-6 xl:gap-5`}
-                            >
-
-                                <div className="navbar flex gap-2 flex-col md:flex-row sm:flex-row justify-between relative z-10">
+<div className="navbar flex gap-2 flex-col md:flex-row sm:flex-row justify-between relative z-10">
                                     <div className="flex gap-6 items-center">
                                         <button onClick={handleLogoutClick} onTouchStart={(e) => { e.preventDefault(); handleLogoutClick(); }}>
                                             <Icon name={"Logout"} hovered={showLogout} />
@@ -388,6 +381,13 @@ const HomeNew = ({ type = null }) => {
                                     </div>
 
                                 </div>
+                        <div className="w-full h-full relative z-[1] overflow-y-scroll CustomScroller">
+
+                            <div
+                                className={`w-full h-fit flex-grow flex-shrink rounded-2xl p-6 xl:p-10 flex flex-col gap-4 sm:gap-6 xl:gap-5`}
+                            >
+
+                                
                                 <div className="list-container"></div>
 
                                 {searchTerm !== '' && searchMoviesData?.movies ? (
