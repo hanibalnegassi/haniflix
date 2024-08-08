@@ -9,7 +9,7 @@
 
 
   .list-container {
-    margin-top: 2rem;
+    margin-top: 1rem;
 
     @media screen and (max-width: 700px) {
 
@@ -24,6 +24,10 @@
         z-index: 10;     /* Ensures the navbar stays above other content */
         backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
         --tw-backdrop-blur: blur(16px);
+        @media screen and (max-width: 700px) {
+
+            margin-top:1rem;
+        }
       }
 
 
@@ -295,4 +299,10 @@
     60% {
         transform: translate(50%, 0%) rotate(360deg);
     }
+}
+@media (max-width: 768px) {
+
+.marting{
+    margin-top: 1rem;
+}
 }

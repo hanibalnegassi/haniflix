@@ -398,7 +398,7 @@ const HomeNew = ({ type = null }) => {
                 />
               </div>
             </div>
-            <div className="w-full h-full relative z-[1] overflow-y-scroll CustomScroller">
+            <div className="w-full h-full relative z-[1] overflow-y-scroll CustomScroller marting">
               <div
                 className={`w-full h-fit flex-grow flex-shrink rounded-2xl p-6 xl:p-10 flex flex-col gap-4 sm:gap-6 xl:gap-5`}
               >
