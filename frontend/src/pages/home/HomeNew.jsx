@@ -379,7 +379,7 @@ const HomeNew = ({ type = null }) => {
                                     </div>
 
                                 </div>
-
+                                <div className="list-container"></div>
 
                                 {searchTerm !== '' && searchMoviesData?.movies ? (
                                     <>
