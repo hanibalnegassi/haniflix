@@ -21,12 +21,14 @@ import { AnimatePresence } from "framer-motion";
 import MovieDetailPanel from "../MovieDetailPanel";
 import { useGetMovieQuery } from "../../store/rtk-query/moviesApi";
 import MovieListItem from "../MovieListItem";
+import {Link} from "react-router-dom";
 
 
 
 
 interface ListProps {
   list: any;
+  genres:any;
   onDelete?: Function;
   onEdit?: Function;
   onHoverMovie?: any;
@@ -37,6 +39,7 @@ interface ListProps {
 
 const List: React.FC<ListProps> = ({
   list,
+  genres,
   onDelete,
   onEdit,
   onHoverMovie,
@@ -50,6 +53,7 @@ const List: React.FC<ListProps> = ({
 
   const carouselRef = useRef();
 
+  debugger
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -80,11 +84,17 @@ const List: React.FC<ListProps> = ({
   };
 
   const containerClass = `flex justify-between gap-5 mb-2 xl:mb-5`
+  
+
+  const genre = genres.find(g => g.title === list?.title.toLowerCase())
+
+  debugger
   return (
     <>
       {list?.content?.length > 0 && <div className={styles["list"]}>
         <div className={containerClass}>
-          <p className="text-base xl:text-lg">{ifTitle || list?.title}</p>
+
+          <Link to={`/genre/${genre?._id}`} className="text-base xl:text-lg">{ifTitle || list?.title}</Link>
 
           <div>
             {onEdit ? (
