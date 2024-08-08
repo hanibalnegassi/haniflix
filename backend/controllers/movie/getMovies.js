@@ -45,10 +45,12 @@ const getMovies = async (req, res) => {
     }
 
     // Filter by genre if genreId is provided
+
+    console.log("genreId", genreId)
     if (genreId) {
       aggregationPipeline.push({
         $match: {
-          genre: mongoose.Types.ObjectId(genreId),
+          genre: new mongoose.Types.ObjectId(genreId),
         },
       });
       aggregationPipeline.push({

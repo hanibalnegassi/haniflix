@@ -45,6 +45,9 @@ const App = () => {
             // backgroundSize: 'cover',
             // backgroundAttachment: 'fixed',
             // backgroundColor: '#0E061E',
+            backgroundColor: "#0E061E",
+            backdropFilter:
+              "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
           }}
           disableButtonStyles
           buttonClasses="theme_button_danger"
