@@ -22,44 +22,43 @@ import Welcome from "./pages/welcome/Welcome";
 
 import AppRouter from "./router/AppRouter";
 
-import './index.css'
+import "./index.css";
 import { SocketProvider } from "./context/SocketContext";
 
-import * as React from 'react'
+import * as React from "react";
 
 const App = () => {
   const user = useAppSelector(selectUser);
-
 
   return (
     <>
       <SocketProvider>
         <AppRouter />
         <CookieConsent
-          containerClasses="cookiebanner bg-slate-950/[.9]"
+          containerClasses="cookiebanner"
           style={{
-            borderRadius: '15px 15px 0px 0px',
-            boxShadow: '0px -10px 15px -5px rgb(255 255 255 / 15%)',
+            borderRadius: "15px 15px 0px 0px",
+            boxShadow: "0px -10px 15px -5px rgb(255 255 255 / 15%)",
             padding: "10px",
             // background: 'url("/images/home0.jpeg") center',
             // backgroundSize: 'cover',
             // backgroundAttachment: 'fixed',
             // backgroundColor: '#0E061E',
-            backgroundColor: "#0E061E",
+            backgroundColor: "transparent",
             backdropFilter:
-              "var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
+              "blur(10px) brightness(80%) contrast(90%) grayscale(0%) hue-rotate(0deg) invert(0%) opacity(90%) saturate(100%) sepia(0%)",
           }}
           disableButtonStyles
-          buttonClasses="theme_button_danger"
+          buttonClasses="theme_button_danger_aligned"
           buttonStyle={{
-            borderColor: '#14f59e',
-            background: '#14f59e1f',
-            color: '#14f59e',
+            borderColor: "#14f59e",
+            background: "#14f59e1f",
+            color: "#14f59e",
           }}
         >
           This website uses cookies to enhance the user experience.
         </CookieConsent>
-      </SocketProvider >
+      </SocketProvider>
     </>
   );
 };

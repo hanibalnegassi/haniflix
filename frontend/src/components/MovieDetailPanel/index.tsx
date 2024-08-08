@@ -251,7 +251,7 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
         </motion.div>)}
 
       <div className="">
-        <span className="text-base modalpopup-text mr-2">{movieToShow?.year}</span> <span className="gradient-text"> • </span> <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.duration}</span> <span className="gradient-text"> • </span>  <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.ageRating}</span> <span className="gradient-text"> • </span>  <span className="text-base capitalize ml-2 mr-2">{renderGenres().join().replace(',', ' • ')}</span>
+        <span className="text-base modalpopup-text mr-2">{movieToShow?.year}</span> <span className="gradient-text"> • </span> <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.duration}</span> <span className="gradient-text"> • </span>  <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.ageRating}</span> <span className="gradient-text"> • </span>  <span className="text-base capitalize ml-2 mr-2">{renderGenres().join().replace(' • ', ' • ')}</span>
       </div>
 
       {movieToShow && (
