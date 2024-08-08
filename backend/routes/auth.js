@@ -22,11 +22,13 @@ const appUrl = process.env.APP_URL; // "http://localhost:3000/";
 
 const getPayPalAccessToken = async () => {
   try {
+
+    const base64String = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString("base64")
     const response = await fetch(`${paypalApiBaseUrl}/v1/oauth2/token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${Buffer.from(`${paypalClientId}:${paypalSecret}`).toString("base64")}`,
+        Authorization: `Basic ${base64String}`,
       },
       body: "grant_type=client_credentials",
     });
@@ -34,6 +36,7 @@ const getPayPalAccessToken = async () => {
       throw new Error(`Failed to fetch PayPal access token: ${response.statusText}`);
     }
     const data = await response.json();
+
     return data.access_token;
   } catch (error) {
     console.error("Error fetching PayPal access token:", error);
@@ -132,8 +135,10 @@ router.post("/v1/payment-success", async (req, res) => {
 
   try {
     // Retrieve PayPal subscription details
+    console.log("before access token")
     const accessToken = await getPayPalAccessToken();
 
+    console.log("got access token", accessToken)
     // Fetch subscription details from PayPal API
     const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${subscriptionId}`, {
       method: 'GET',
@@ -144,6 +149,7 @@ router.post("/v1/payment-success", async (req, res) => {
       }
     });
 
+    console.log("response here", response)
     // Handle HTTP errors
     if (!response.ok) {
       throw new Error(`Failed to retrieve PayPal subscription: ${response.status} - ${response.statusText}`);
@@ -151,6 +157,8 @@ router.post("/v1/payment-success", async (req, res) => {
 
     // Parse JSON response data
     const subscription = await response.json();
+
+    console.log("subscription", subscription)
 
 
     // Check if user already exists
@@ -206,6 +214,7 @@ router.post("/v1/payment-success", async (req, res) => {
       return res.json({ message: "Payment failed" });
     }
   } catch (error) {
+    console.error(error)
     console.error("Error retrieving subscription:", error);
     res.status(500).send(error.message);
   }
@@ -492,11 +501,13 @@ async function registerUser(email, password, username) {
 //LOGIN
 router.post("/login", async (req, res) => {
   try {
+
     const userEmail = req.body.email.toLowerCase(); // Convert user input to lowercase
     const user = await User.findOne({
       email: { $regex: new RegExp("^" + userEmail + "$", "i") },
     });
 
+    console.log("user", user)
     if (!user) {
       res.status(400).json({ message: "Wrong email provided!" });
       return;
@@ -513,6 +524,8 @@ router.post("/login", async (req, res) => {
     const bytes = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
     const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
 
+
+    console.log("originalPassword", originalPassword)
     if (originalPassword !== req.body.password) {
       res.status(400).json({
         message: "Wrong password or username!",
@@ -523,6 +536,9 @@ router.post("/login", async (req, res) => {
     if (user.isAdmin === false) {
 
       const accessTokenPP = await getPayPalAccessToken();
+
+
+      console.log("accessTokenPP",accessTokenPP)
       const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
         method: 'GET',
         headers: {
@@ -531,11 +547,14 @@ router.post("/login", async (req, res) => {
           'Accept': 'application/json',
         }
       });
-      const subscription = await response.json();
 
       if (!response.ok) {
         throw new Error('Failed to retrieve PayPal subscription');
       }
+
+      const subscription = await response.json();
+
+      // console.log("subscription", subscription)
 
       if (subscription.status !== 'ACTIVE') {
         await User.findOneAndUpdate(

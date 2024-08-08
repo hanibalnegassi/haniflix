@@ -169,7 +169,7 @@ async function searchAndScrapeMovies(
     for (const movieInfo of movieInfos) {
       let addedMovie;
       let retryCount = 0;
-      const RETRY_ATTEMPTS = 3;
+      const RETRY_ATTEMPTS = 1;
       countInCurrentBatch++;
 
       while (!addedMovie && retryCount <= RETRY_ATTEMPTS) {
