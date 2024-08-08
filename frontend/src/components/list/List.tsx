@@ -82,7 +82,7 @@ const List: React.FC<ListProps> = ({
   return (
     <>
       {list?.content?.length > 0 && <div className={styles["list"]}>
-        <div className="flex justify-between gap-5 mb-2 xl:mb-5">
+        <div className="flex justify-between gap-5 mb-2 mt-5 xl:mb-5">
           <p className="text-base xl:text-lg">{ifTitle || list?.title}</p>
 
           <div>
