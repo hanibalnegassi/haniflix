@@ -6,12 +6,19 @@ import { useGetGenresQuery } from "../../store/rtk-query/genresApi";
 import { motion, AnimatePresence } from "framer-motion";
 import "./movieDetails.scss";
 import { useAddMovieToDefaultListMutation } from "../../store/rtk-query/listsApi";
-import { useDislikeMovieMutation, useLikeMovieMutation } from "../../store/rtk-query/moviesApi";
+import {
+  useDislikeMovieMutation,
+  useLikeMovieMutation,
+} from "../../store/rtk-query/moviesApi";
 import CustomButton from "../GradientButton";
 
-
-
-export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovie, type, refetch }) {
+export default function MovieDetailPanel({
+  movieToShow,
+  onPlayMovie,
+  onHoverMovie,
+  type,
+  refetch,
+}) {
   const imageToshow = React.useMemo(() => {
     return movieToShow?.imgTitle ? movieToShow?.imgTitle : moviePlaceHolderSvg;
   }, [movieToShow]);
@@ -50,8 +57,8 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
   const handleHover = (movie) => {
     // onHoverMovie?.(movie);
   };
-  const showActionOnMobile = false
-  const showActionButtons = true
+  const showActionOnMobile = false;
+  const showActionButtons = true;
 
   const showSwal = (title, message, type) => {
     Swal.fire({
@@ -60,7 +67,6 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
       icon: type,
     });
   };
-
 
   const onAddToList = async () => {
     const res = await addToMyList(movieToShow?._id);
@@ -78,14 +84,18 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
   };
 
   const renderActionButtons = () => {
-
     //like buttons
     return (
-      <div className={`flex-grow ${showActionOnMobile ? !showActionButtons ? "flex !px-[14vw] !py-2" : "flex " : "flex min-w-[180px]"} justify-between items-center px-3`}>
-        <button
-          onClick={onAddToList}
-          className="bg-transparent cursor-pointer"
-        >
+      <div
+        className={`flex-grow ${
+          showActionOnMobile
+            ? !showActionButtons
+              ? "flex !px-[14vw] !py-2"
+              : "flex "
+            : "flex min-w-[180px]"
+        } justify-between items-center px-3`}
+      >
+        <button onClick={onAddToList} className="bg-transparent cursor-pointer">
           {addToMyListState?.isLoading ? (
             <Icon name={"Loading"} size={"M"} />
           ) : (
@@ -104,7 +114,6 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
           }}
           className="bg-transparent cursor-pointer"
         >
-
           <span className="flex items-center gap-2">
             {likeMovieState?.isLoading ? (
               <Icon name={"Loading"} size={"M"} />
@@ -114,7 +123,8 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
                   <Icon name={"Like"} size={"M"} hovered />
                 ) : (
                   <Icon name={"Like"} size={"M"} />
-                )} {movieToShow?.likesCount}
+                )}{" "}
+                {movieToShow?.likesCount}
               </>
             )}
           </span>
@@ -125,7 +135,6 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
           }}
           className="bg-transparent cursor-pointer"
         >
-
           <span className="flex items-center gap-2">
             {dislikeMovieState?.isLoading ? (
               <Icon name={"Loading"} size={"M"} />
@@ -135,15 +144,14 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
                   <Icon name={"Dislike"} size={"M"} hovered />
                 ) : (
                   <Icon name={"Dislike"} size={"M"} />
-                )} {movieToShow?.dislikesCount}
+                )}{" "}
+                {movieToShow?.dislikesCount}
               </>
             )}
           </span>
         </button>
       </div>
     );
-
-
   };
   const applyLikeInFrontend = (action: "like" | "dislike") => {
     setIsLike((cur) => {
@@ -198,17 +206,21 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
     let genreTextArr = [];
 
     if (movieToShow?.genre) {
-      genreTextArr = movieToShow.genre.map((genre) => {
-        const genreObj = typeof genre === 'object' ? genre : genresData.genres.find(_genre => _genre._id === genre);
-        return genreObj?.title;
-      }).filter(text => text !== undefined);
+      genreTextArr = movieToShow.genre
+        .map((genre) => {
+          const genreObj =
+            typeof genre === "object"
+              ? genre
+              : genresData.genres.find((_genre) => _genre._id === genre);
+          return genreObj?.title;
+        })
+        .filter((text) => text !== undefined);
     }
 
     return genreTextArr;
-  }
+  };
 
   return (
-
     <motion.div
       key={movieToShow?._id}
       initial="hidden"
@@ -217,14 +229,11 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
       variants={tabVariant}
       transition={parentTransition}
       className="flex flex-col gap-5 relative z-10"
-      style={{ height: '40em' }} 
->
-     
-
-
+      style={{ height: "40em" }}
+    >
       <iframe
         src={movieToShow?.imgTitle}
-        style={{ width: '100%', height: "100%", objectFit: "cover" }}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
       ></iframe>
       <p className="text-base ">{movieToShow?.title}</p>
 
@@ -235,9 +244,9 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
               <button
                 className={"theme_button_danger"}
                 style={{
-                  borderColor: '#14f59e',
-                  background: '#14f59e1f',
-                  color: '#14f59e',
+                  borderColor: "#14f59e",
+                  background: "#14f59e1f",
+                  color: "#14f59e",
                 }}
                 onClick={onClickPlayMovie}
               >
@@ -246,18 +255,42 @@ export default function MovieDetailPanel({ movieToShow, onPlayMovie, onHoverMovi
 
               {renderActionButtons()}
             </div>
-
           </div>
-        </motion.div>)}
+        </motion.div>
+      )}
 
       <div className="">
-        <span className="text-base modalpopup-text mr-2">{movieToShow?.year}</span> <span className="gradient-text"> • </span> <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.duration}</span> <span className="gradient-text"> • </span>  <span className="text-base modalpopup-text ml-2 mr-2">{movieToShow?.ageRating}</span> <span className="gradient-text"> • </span>  <span className="text-base capitalize ml-2 mr-2">{renderGenres().join().replace(' • ', ' • ')}</span>
+        <span className="text-base modalpopup-text mr-2">
+          {movieToShow?.year}
+        </span>{" "}
+        <span className="gradient-text"> • </span>{" "}
+        <span className="text-base modalpopup-text ml-2 mr-2">
+          {movieToShow?.duration}
+        </span>{" "}
+        <span className="gradient-text"> • </span>{" "}
+        <span className="text-base modalpopup-text ml-2 mr-2">
+          {movieToShow?.ageRating}
+        </span>{" "}
+        {/* <span className="gradient-text"> • </span>{" "} */}
+        <span className="text-base capitalize ml-2 mr-2">
+          {renderGenres().map((title) => {
+            return (
+              <label>
+                {" "}
+                <span className="gradient-text"> • </span>
+                <span className="textAdjust">{title}</span>
+              </label>
+            );
+          })}
+        </span>
       </div>
 
       {movieToShow && (
         <motion.div variants={tabChildVariant}>
           {/* <p className="text-lg">Description</p> */}
-          <p className="text-base modalpopup-description">{movieToShow?.desc}</p>
+          <p className="text-base modalpopup-description">
+            {movieToShow?.desc}
+          </p>
         </motion.div>
       )}
       {/* 
