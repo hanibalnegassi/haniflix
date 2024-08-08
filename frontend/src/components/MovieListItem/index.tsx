@@ -109,7 +109,7 @@ export default function MovieListItem({
 
   const debouncedOnHover = React.useCallback(
     debounce((movie) => {
-      onHover(movie);
+      onHover && onHover(movie);
     }, 300),
     [] // Ensure it only gets created once
   );

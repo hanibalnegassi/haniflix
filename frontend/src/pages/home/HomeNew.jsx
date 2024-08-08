@@ -7,6 +7,7 @@ import { useGetUserQuery } from "../../store/rtk-query/usersApi";
 import Featured from "../../components/featured/Featured";
 import List from "../../components/list/List";
 import Navbar from "../../components/navbar/Navbar";
+import { useGetGenresQuery } from '../../store/rtk-query/genresApi';
 import useApiClient from "../../hooks/useApiClient";
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -90,6 +91,12 @@ const HomeNew = ({ type = null }) => {
             }
         );
 
+        const { data: genresData, isLoading, error } = useGetGenresQuery({}, {
+            refetchOnMountOrArgChange: true,
+        });
+
+        const genres = genresData?.genres
+
     const { data: myListData, isLoading: myListLoading, refetch: refetchmyList } = useGetMyListQuery({
         searchTerms: "",
     });
@@ -151,6 +158,8 @@ const HomeNew = ({ type = null }) => {
         // pollingInterval: 10000,
         refetchOnMountOrArgChange: true,
     });
+
+    
     // console.log("searchMoviesData: ", searchMoviesData)
     const showSearchDropdown = React.useMemo(() => {
         let show = false;
@@ -389,8 +398,9 @@ const HomeNew = ({ type = null }) => {
                                                 ifTitle='Search Result'
                                                 onHoverMovie={onHoverOverMovie}
                                                 isObject={true}
+                                                genres={genres}
                                                 list={{
-                                                    content: searchMoviesData?.movies,
+                                                    content: searchMoviesData?.movies
                                                 }}
                                             />
                                         </motion.div>
@@ -403,6 +413,7 @@ const HomeNew = ({ type = null }) => {
                                                 onPlayMovie={onPlayMovie}
                                                 ifTitle='Continue Watching'
                                                 onHoverMovie={onHoverOverMovie}
+                                                genres={genres}
                                                 list={{
                                                     ...continueWatchingListData?.list,
                                                 }}
@@ -417,6 +428,7 @@ const HomeNew = ({ type = null }) => {
                                                 onPlayMovie={onPlayMovie}
                                                 onHoverMovie={onHoverOverMovie}
                                                 ifTitle='My list'
+                                                genres={genres}
                                                 list={{
                                                     ...myListData?.[0],
                                                 }}
@@ -431,6 +443,7 @@ const HomeNew = ({ type = null }) => {
                                         <List
                                             onPlayMovie={onPlayMovie}
                                             onHoverMovie={onHoverOverMovie}
+                                            genres={genres}
                                             key={list._id}
                                             list={list}
                                         />
