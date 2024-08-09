@@ -15,9 +15,9 @@ import { Box } from "@mui/material";
 const api_url = import.meta.env.VITE_APP_API_URL;
 
 //  please include these into env and fetch from there and change for live as well
-const planID = "P-8XE30128VC9578040M2H2JKY";
+const planID = "P-9C526924KG451722TMZ4DMLQ";
 const clientID =
-  "AaXHHCwkY-zx_TBNzo1FtDdHG2VUd1LkTAuFigkuF9VY17JQyE_uW_qgAHMkqBlBVz2Xww5RwHO52S9H";
+  "ATXOX-P3HkSsiVymj1DpP8asOm7_EyB-UmNzRDExM30eshEWIRNuy5OSNVoUL7TgXQcDA2AJNW5XxrQa";
 
 const Register = () => {
   const [login, loginState] = useLoginMutation();
