@@ -120,8 +120,11 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  right: 54rem;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  left: 31rem;
+  top: 1rem;
 
 
   &:hover {
@@ -156,6 +159,8 @@ body {
   .theme_button_danger_aligned {
     position: relative;
     left: 15rem!important;
-    bottom: 1rem!important;
+    bottom: 0rem!important;
+    top: -1rem!important;
+    right: 0px!important;
   }
 }
