@@ -138,7 +138,7 @@ const Register = () => {
         debugger;
         console.log(res.data.redirect, "whats here coming");
         const url = await res.data.redirect;
-        window.location.replace(url);
+        window.location.href = url;
       })
       .catch((e) => {
         console.log(e);
