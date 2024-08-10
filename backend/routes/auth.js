@@ -124,8 +124,8 @@ async function createSubscriptionWithTrial(customerId, priceId) {
           subscription_data: {
             trial_period_days: 30, // Set the trial period to 30 days
           },
-          success_url: 'http://localhost:5173/thank-you?session_id={CHECKOUT_SESSION_ID}',
-          cancel_url: 'http://localhost:5173/cancel',
+          success_url: `${process.env.APP_URL}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${process.env.APP_URL}/cancel`,
         });
     
         console.log('Checkout session created successfully:', session.id);
