@@ -157,10 +157,10 @@ body {
 }
 @media (max-width: 768px) {
   .theme_button_danger_aligned {
-    position: fixed;
-    left: 15rem !important;
-    bottom: 0rem !important;
-    top: 3.2rem !important;
-    right: 0 !important;
+    position: relative;
+    left: 13rem!important;
+    bottom: 0rem!important;
+    top: -1rem!important;
+    right: 0px!important;
   }
 }
