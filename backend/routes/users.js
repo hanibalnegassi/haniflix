@@ -3,6 +3,7 @@ const verify = require("../middleware/verifyToken");
 const userController = require("../controllers/user");
 
 //CREATE
+
 router.post("/", verify, userController.createUser);
 
 //UPDATE

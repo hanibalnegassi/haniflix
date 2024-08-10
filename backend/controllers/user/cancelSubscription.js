@@ -5,6 +5,7 @@ const qs = require("qs");
 const PAYPAL_API_BASE_URL = process.env.PAYPAL_BASE_URL;
 const paypalClientId = process.env.PAYPAL_CLIENT_ID;
 const paypalSecret = process.env.PAYPAL_SECRET;
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
 
@@ -19,51 +20,21 @@ const cancelSubscription = async (req, res) => {
 
     if (user.subscriptionId) {
       const subscriptionId = user.subscriptionId;
-
+      console.log(subscriptionId, "sdfas")
       // Construct the request body
       const requestBody = {
         reason: "Cancelled by user",
       };
 
-      // Make API request to cancel subscription
-      const accessToken = await getPayPalAccessToken(); // Function to retrieve access token
-      if (!accessToken) {
-        return res.status(500).json({ error: "Failed to retrieve access token" });
-      }
-
-
-
-      const cancelSubscriptionUrl = `${PAYPAL_API_BASE_URL}/v1/billing/subscriptions/${subscriptionId}/cancel`;
-
       try {
-        const response = await axios.post(cancelSubscriptionUrl, requestBody, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-
-
-        // Handle response from PayPal
-        if (response.status === 204) {
-          // Update your user model or mark subscription as canceled
-          user.isSubscribed = false;
-          await user.save();
-
-          return res.status(200).json({
-            message: "Subscription has been canceled.",
-          });
-        } else {
-          return res.status(500).json({
-            error: "Failed to cancel subscription.",
-          });
-        }
-      } catch (apiError) {
-        console.error("API Error:", apiError.response ? apiError.response.data : apiError.message);
-        return res.status(500).json({
-          error: "Error communicating with PayPal.",
-        });
+        // Cancel the subscription
+        const canceledSubscription = await stripe.subscriptions.cancel(subscriptionId);
+    
+        console.log('Subscription canceled successfully:', canceledSubscription.id);
+        return canceledSubscription;
+      } catch (error) {
+        console.error('Error canceling subscription:', error);
+        throw error;
       }
     } else {
       return res.status(400).json({

@@ -94,7 +94,7 @@ const AppRouter = (props) => {
                     />
                     <Route
                         path="/thank-you"
-                        element={<ThankYouPage />}
+                        element={user ? <Navigate to="/" /> : <ThankYouPage />}
                     />
 
                     <Route path="/privacy-policy" element={<PrivacyPage />} />
