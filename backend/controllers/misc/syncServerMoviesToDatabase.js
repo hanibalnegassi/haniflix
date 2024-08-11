@@ -27,7 +27,7 @@ const syncServerMoviesToDatabase = async (req, res) => {
       const s3Objects = await s3.listObjectsV2(params).promise();
       console.log(s3Objects,"whats here")
       for (const s3Object of s3Objects.Contents) {
-        const movieFileName = path.basename(s3Object.Key);
+        const movieFileName = path.basename(s3Object.Key)
         if (s3Object.Key.endsWith('/')) {
           Logger.info(movieFileName + " is a folder, skipping...");
           continue;
@@ -57,7 +57,7 @@ const syncServerMoviesToDatabase = async (req, res) => {
   
         if (!existingMovie) {
           existingMovie = await Movie.findOne({
-            video: 'https://cdn.haniflix.com/' + s3Object.Key
+            video: 'https://' + s3Object.Key
           });
         }
   
@@ -68,7 +68,7 @@ const syncServerMoviesToDatabase = async (req, res) => {
   
         const movie = new Movie({
           title: title,
-          video: 'https://cdn.haniflix.com/' + s3Object.Key,
+          video: 'https://' + s3Object.Key,
           year: year,
         });
         await movie.save();
