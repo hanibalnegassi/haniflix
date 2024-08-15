@@ -21,11 +21,14 @@ import { AnimatePresence } from "framer-motion";
 import MovieDetailPanel from "../MovieDetailPanel";
 import { useGetMovieQuery } from "../../store/rtk-query/moviesApi";
 import MovieListItem from "../MovieListItem";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+
+
+
 
 interface ListProps {
   list: any;
-  genres: any;
+  genres:any;
   onDelete?: Function;
   onEdit?: Function;
   onHoverMovie?: any;
@@ -45,6 +48,7 @@ const List: React.FC<ListProps> = ({
   isObject,
   ...otherProps
 }) => {
+
   const user = useAppSelector(selectUser);
 
   const carouselRef = useRef();
@@ -78,96 +82,91 @@ const List: React.FC<ListProps> = ({
     onPlayMovie?.(movie, axis);
   };
 
-  const containerClass = `flex justify-between gap-5 mb-2 xl:mb-5`;
+  const containerClass = `flex justify-between gap-5 mb-2 xl:mb-5`
+  
 
-  const genre = genres.find((g) => g?.title === list?.title?.toLowerCase());
+  const genre = genres.find(g => g?.title === list?.title?.toLowerCase())
 
   return (
     <>
-      {list?.content?.length > 0 && (
-        <div className={styles["list"]}>
-          <div className={containerClass}>
-            <Link
-              to={`/genre/${genre?._id}`}
-              className="text-base xl:text-lg hover:underline"
-            >
-              {ifTitle || list?.title}
-            </Link>
+      {list?.content?.length > 0 && <div className={styles["list"]}>
+        <div className={containerClass}>
 
-            <div>
-              {onEdit ? (
-                <span style={{ cursor: "pointer" }} onClick={() => onEdit()}>
-                  <Edit />
-                </span>
-              ) : null}
-              {user?.defaultList !== list?._id && onDelete ? (
-                <span style={{ cursor: "pointer" }} onClick={() => onDelete()}>
-                  <Delete />
-                </span>
-              ) : null}
-            </div>
-          </div>
+          <Link to={`/genre/${genre?._id}`} className="text-base xl:text-lg hover:underline">{ifTitle || list?.title}</Link>
 
-          <div className={styles["wrapper"]}>
-            <Carousel
-              ref={carouselRef}
-              responsive={responsive}
-              // centerMode={true}
-              rewind={true}
-              rewindWithAnimation={false}
-              additionalTransfrom={0}
-              shouldResetAutoplay
-              slidesToSlide={2}
-              infinite={false}
-              centerMode={false}
-              draggable
-              // infinite
-              swipeable
-              containerClass={addClassNames(isMobile ? "" : "overflow-visible")}
-              customRightArrow={
-                <div
-                  className={addClassNames(
-                    styles["sliderArrow"],
-                    styles["right"]
-                  )}
-                >
-                  <img src={NextPlump} alt="" />
-                </div>
-              }
-              customLeftArrow={
-                <div
-                  className={addClassNames(
-                    styles["sliderArrow"],
-                    styles["left"]
-                  )}
-                >
-                  <img src={PrevPlump} alt="" />
-                </div>
-              }
-              itemClass={addClassNames(
-                // "!w-[120px] sm:!w-[11vw]",
-                `p-2 carousel-item`
-              )}
-            >
-              {list?.content?.map((movieId, i) => {
-                if (!movieId) return;
-
-                return (
-                  <MovieListItem
-                    onClick
-                    key={i}
-                    index={i}
-                    movieId={movieId}
-                    movieObj={isObject ? movieId : null}
-                    onHover={handleHover}
-                    onPlayMovie={onClickPlayMovie}
-                  />
-                );
-              })}
-            </Carousel>
+          <div>
+            {onEdit ? (
+              <span style={{ cursor: "pointer" }} onClick={() => onEdit()}>
+                <Edit />
+              </span>
+            ) : null}
+            {user?.defaultList !== list?._id && onDelete ? (
+              <span style={{ cursor: "pointer" }} onClick={() => onDelete()}>
+                <Delete />
+              </span>
+            ) : null}
           </div>
         </div>
-      )}
+
+        <div className={styles["wrapper"]}>
+          <Carousel
+            ref={carouselRef}
+            responsive={responsive}
+            // centerMode={true}
+            rewind={true}
+            rewindWithAnimation={false}
+            additionalTransfrom={0}
+            shouldResetAutoplay
+            slidesToSlide={2}
+
+            infinite={false}
+            centerMode={false}
+            draggable
+            // infinite
+            swipeable
+            containerClass={addClassNames(isMobile ? "" : "overflow-visible")}
+            customRightArrow={
+              <div className={addClassNames(
+                styles["sliderArrow"],
+                styles["right"],
+              )}>
+                <img src={NextPlump} alt="" />
+              </div>
+            }
+            customLeftArrow={
+              <div className={addClassNames(
+                styles["sliderArrow"],
+                styles["left"]
+              )}>
+                <img src={PrevPlump} alt="" />
+              </div>
+            }
+            itemClass={addClassNames(
+              // "!w-[120px] sm:!w-[11vw]",
+              `p-2 carousel-item`
+            )}
+          >
+            {list?.content?.map((movieId, i) => {
+              if (!movieId) return;
+
+              return (
+
+                <MovieListItem
+                  onClick
+                  key={i}
+                  index={i}
+                  movieId={movieId}
+                  movieObj={isObject ? movieId : null}
+                  onHover={handleHover}
+                  onPlayMovie={onClickPlayMovie}
+                />
+              );
+            })}
+
+          </Carousel>
+        </div>
+
+      </div>}
     </>
   );
 };
