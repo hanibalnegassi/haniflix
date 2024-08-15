@@ -92,7 +92,7 @@ const List: React.FC<ListProps> = ({
       {list?.content?.length > 0 && <div className={styles["list"]}>
         <div className={containerClass}>
 
-          <Link to={`/genre/${genre?._id}`} className="text-base xl:text-lg">{ifTitle || list?.title}</Link>
+          <Link to={`/genre/${genre?._id}`} className="text-base xl:text-lg hover:underline">{ifTitle || list?.title}</Link>
 
           <div>
             {onEdit ? (
