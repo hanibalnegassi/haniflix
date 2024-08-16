@@ -16,114 +16,93 @@ const ThankYouPage = () => {
 
   const api_url = import.meta.env.VITE_APP_API_URL;
   useEffect(() => {
-    debugger;
     console.log(" i ran ");
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("session_id");
-    console.log(id); // Outputs: 12345
-    if (id) {
-      const savedEmail = localStorage.getItem("haniemail");
-      const savedPassword = localStorage.getItem("hanipassword");
+    if (success) {
+      let email = localStorage.getItem("haniemail");
+      let password = localStorage.getItem("hanipassword");
+      let username = localStorage.getItem("haniusername");
+      console.log(email);
+      if (email) {
+        const hashEmail = CryptoES.SHA256(email).toString();
+        let time = Math.floor(Date.now() / 1000);
 
-      console.log(savedEmail, "savedEmail");
-      console.log(savedPassword, "savedPassword");
-      onLogin(savedEmail, savedPassword);
-      console.log(" after trying to login");
+        let data = JSON.stringify({
+          data: [
+            {
+              event_name: "Purchase",
+              event_time: time,
+              action_source: "website",
+              user_data: {
+                em: [hashEmail],
+              },
+              custom_data: {
+                currency: "USD",
+                value: 0.99,
+              },
+            },
+          ],
+        });
+
+        let config = {
+          method: "post",
+          url: "https://graph.facebook.com/v17.0/463413816189920/events?access_token=EAAGBZCN2k3EMBOZB158dnZBdNFUH9K8w56mjOKwtyDhLbE5D0LpAfBfY2PqOxEZCT0r4B3fGyLzwMrKvcjDnjcqu2fXbUHSH66hPVtDspey8KDGD1zkDlcZB6IIdc6jW4dE20IoChikN3UF7yGwMdZBkwWAB6ii8HyMyQABCwhYCcOk26vQrvQGoarlOAvTDwv9wZDZD",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: data,
+        };
+
+        axios(config)
+          .then(function (response) {
+            console.log(JSON.stringify(response.data));
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
+
+      const getQueryParams = () => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          subscriptionId: params.get("sub"),
+        };
+      };
+
+      const { subscriptionId } = getQueryParams();
+      axios
+        .post(api_url + "auth/v1/payment-success", {
+          subscriptionId: subscriptionId,
+          email,
+          password,
+          username,
+        })
+        .then(async (res) => {
+          // alert();
+          Swal.fire({
+            title: "Success",
+            text: "Success! Check your email for the invoice. You can proceed to login",
+            icon: "success",
+          });
+          const savedEmail = localStorage.getItem("haniemail");
+          const savedPassword = localStorage.getItem("hanipassword");
+
+          console.log(savedEmail, "savedEmail");
+          console.log(savedPassword, "savedPassword");
+          await onLogin(savedEmail, savedPassword);
+          console.log(" after trying to login");
+          console.log(res.data.message);
+        })
+
+        .catch((e) => {
+          Swal.fire({
+            title: "Success",
+            text: e.error,
+            icon: "success",
+          });
+          console.log(e.error);
+        });
     }
   }, []);
-  // useEffect(() => {
-  //     console.log(" i ran ");
-  //     if (success) {
-  //         let email = localStorage.getItem('haniemail')
-  //         let password = localStorage.getItem('hanipassword')
-  //         let username = localStorage.getItem('haniusername')
-  //         console.log(email)
-  //         if (email) {
-
-  //             const hashEmail = CryptoES.SHA256(email).toString()
-  //             let time = Math.floor(Date.now() / 1000)
-
-  //             let data = JSON.stringify({
-  //                 "data": [
-  //                     {
-  //                         "event_name": 'Purchase',
-  //                         "event_time": time,
-  //                         "action_source": "website",
-  //                         "user_data": {
-  //                             "em": [
-  //                                 hashEmail
-  //                             ]
-  //                         },
-  //                         "custom_data":
-  //                         {
-  //                             "currency": "USD",
-  //                             "value": 0.99
-  //                         }
-  //                     }
-  //                 ],
-  //             });
-
-  //             let config = {
-  //                 method: 'post',
-  //                 url: 'https://graph.facebook.com/v17.0/463413816189920/events?access_token=EAAGBZCN2k3EMBOZB158dnZBdNFUH9K8w56mjOKwtyDhLbE5D0LpAfBfY2PqOxEZCT0r4B3fGyLzwMrKvcjDnjcqu2fXbUHSH66hPVtDspey8KDGD1zkDlcZB6IIdc6jW4dE20IoChikN3UF7yGwMdZBkwWAB6ii8HyMyQABCwhYCcOk26vQrvQGoarlOAvTDwv9wZDZD',
-  //                 headers: {
-  //                     'Content-Type': 'application/json'
-  //                 },
-  //                 data: data
-  //             };
-
-  //             axios(config)
-  //                 .then(function (response) {
-  //                     console.log(JSON.stringify(response.data));
-  //                 })
-  //                 .catch(function (error) {
-  //                     console.log(error);
-  //                 });
-
-  //         }
-
-  //         const getQueryParams = () => {
-  //             const params = new URLSearchParams(window.location.search);
-  //             return {
-  //                 subscriptionId: params.get('sub'),
-  //             };
-  //         };
-
-  //         const { subscriptionId } = getQueryParams();
-  //         axios
-  //             .post(api_url + "auth/v1/payment-success", {
-  //                 subscriptionId: subscriptionId,
-  //                 email,
-  //                 password,
-  //                 username,
-  //             })
-  //             .then(async (res) => {
-  //                 // alert();
-  //                 Swal.fire({
-  //                     title: "Success",
-  //                     text: "Success! Check your email for the invoice. You can proceed to login",
-  //                     icon: "success",
-  //                 });
-  //                 const savedEmail = localStorage.getItem("haniemail");
-  //                 const savedPassword = localStorage.getItem("hanipassword");
-
-  //                 console.log(savedEmail, "savedEmail");
-  //                 console.log(savedPassword, "savedPassword");
-  //                 await onLogin(savedEmail, savedPassword);
-  //                 console.log(" after trying to login");
-  //                 console.log(res.data.message);
-  //             })
-
-  //             .catch((e) => {
-  //                 Swal.fire({
-  //                     title: "Success",
-  //                     text: e.error,
-  //                     icon: "success",
-  //                 });
-  //                 console.log(e.error);
-  //             });
-  //     }
-  // }, [])
 
   const onLogin = async (email: string, password: string) => {
     console.log("i tried logging in");

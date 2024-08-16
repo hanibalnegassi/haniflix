@@ -17,7 +17,6 @@ const planId = process.env.PAYPAL_PLAN_ID;
 const paypalClientId = process.env.PAYPAL_CLIENT_ID;
 const paypalSecret = process.env.PAYPAL_SECRET;
 const appUrl = process.env.APP_URL; // "http://localhost:3000/";
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -84,61 +83,10 @@ const createPayPalSubscription = async (accessToken, planId, email, username) =>
     throw new Error("Failed to create PayPal subscription");
   }
 };
-// Function to get a list of plans/prices
-async function listPlans() {
-  try {
-    // Retrieve the list of prices
-    const prices = await stripe.prices.list({
-      limit: 10, // You can adjust the limit as needed
-    });
 
-    console.log('List of Plans/Prices:', prices.data[0]);
-    return prices.data[0];
-  } catch (error) {
-    console.error('Error retrieving plans/prices:', error);
-    throw error;
-  }
-}
-async function createCustomer() {
-     const customer = await stripe.customers.create({
-                name: "Hasnat",
-                email: "hasnat98044@gmail.com",
-            });
-            const CustomerId = customer.id; // Return the Customer ID*/
-            console.log(CustomerId, "customer Id")
-}
-// Function to create a subscription with a trial period
-async function createSubscriptionWithTrial(customerId, priceId) {
-    try {
-        // Create a Checkout session with a 1-month trial period
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
-          mode: 'subscription',
-          customer: customerId,
-          line_items: [
-            {
-              price: priceId,
-              quantity: 1,
-            },
-          ],
-          subscription_data: {
-            trial_period_days: 30, // Set the trial period to 30 days
-          },
-          success_url: `${process.env.APP_URL}thank-you?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${process.env.APP_URL}cancel`,
-        });
-    
-        console.log('Checkout session created successfully:', session.id);
-        return session;
-      } catch (error) {
-        console.error('Error creating Checkout session:', error);
-        throw error;
-      }
-  }
-  
 router.post("/v1/create-subscription-checkout-session", async (req, res) => {
-  const { email, username, password } = req.body;
-  console.log(req.body, "req body")
+  const { email, username } = req.body;
+
   try {
     // Check if email already exists
     const emailExists = await User.findOne({ email: email });
@@ -157,51 +105,12 @@ router.post("/v1/create-subscription-checkout-session", async (req, res) => {
         statusText: "This username already exists. Try another username",
       });
     }
-     // Retrieve PayPal subscription details
-     const plans = await listPlans();
 
-     console.log("Plan", plans)
- 
-     const customer = await stripe.customers.create({
-       name: username,
-       email: email,
-   });
-   const CustomerId = customer.id; // Return the Customer ID*/
-   console.log(CustomerId, "customer Id")
-     // Fetch subscription details from PayPal API
-     const subscription = await createSubscriptionWithTrial(CustomerId, plans.id);
-     console.log('Subscription:', subscription);
-     // Create a new user if not exists and payment is successful
-     if (subscription) {
-     
-       // Encrypt password and generate OTP
-       const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY).toString();
-       const otp = CryptoJS.lib.WordArray.random(16);
- 
-       // Create new user in the database
-       const newUser = await new User({
-         username,
-         email: email,
-         otp,
-         password: encryptedPassword,
-         isSubscribed: true,
-         subscriptionId: subscription.id,
-       }).save();
- 
-       // Create default list for the user
-       const defaultList = new List({
-        title: `${email}'s Watchlist`,
-        user: newUser._id,
-      });
-      await defaultList.save();
-
-      // Update user's lists and defaultList
-      newUser.lists.push(defaultList._id);
-      newUser.defaultList = defaultList._id;
-      await newUser.save();
-
-      return res.status(200).json({ status: "success", data: {user:newUser}, redirect: subscription.url });
-      }
+    // If both email and username are unique
+    return res.status(200).json({
+      success: true,
+      statusText: "Both email and username are available",
+    });
   } catch (error) {
     res.status(500).json({
       error: true,
@@ -623,6 +532,43 @@ router.post("/login", async (req, res) => {
       });
       return;
     }
+
+    if (user.isAdmin === false) {
+
+      const accessTokenPP = await getPayPalAccessToken();
+
+
+      console.log("accessTokenPP",accessTokenPP)
+      const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessTokenPP}`,
+          'Accept': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to retrieve PayPal subscription');
+      }
+
+      const subscription = await response.json();
+
+      // console.log("subscription", subscription)
+
+      if (subscription.status !== 'ACTIVE') {
+        await User.findOneAndUpdate(
+            {email: userEmail},
+            {isSubscribed: false}
+        );
+        res.status(400).json({
+          message: "User subscription has expired or is inactive",
+        });
+        return;
+      }
+
+    }
+
     const accessToken = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.SECRET_KEY,
