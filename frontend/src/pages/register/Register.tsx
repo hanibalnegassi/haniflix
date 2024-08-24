@@ -15,9 +15,9 @@ import { Box } from "@mui/material";
 const api_url = import.meta.env.VITE_APP_API_URL;
 
 //  please include these into env and fetch from there and change for live as well
-const planID = "P-13A2652370295474DM27UCFI";
+const planID = "P-8XR88701J0316314TM3CJB4Y";
 const clientID =
-  "AR9tvXxOWv2K300LKOW5t6SOym0LIlPkNGrnW38oe3ExU3juxOSCGUz-rkcRuJOS0eAb35U-vwsnoRtQ";
+  "AW9v1SNm4hqSbBJ_0kfZLUuImhnfEC_yYv4I4QUSG1PALH1-gj6CG_li04NnGR1U04LlxMmGcj22wvvU";
 
 const Register = () => {
   const [login, loginState] = useLoginMutation();
@@ -161,22 +161,6 @@ const Register = () => {
           icon: "error",
         });
       });
-  };
-
-  const onLogin = async (email, password) => {
-    console.log("i tried logging in");
-    const res = await login({ email, password });
-    console.log(res);
-    if (res?.data) {
-      console.log("Login successful");
-    }
-    if (!res?.data) {
-      Swal.fire({
-        title: res?.error.message || "Error encountered during login",
-        text: res?.error.message,
-        icon: "error",
-      });
-    }
   };
 
   // useEffect(() => {
