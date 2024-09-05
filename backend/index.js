@@ -25,12 +25,12 @@ const webhookRoute = require("./routes/webhook");
 
 // Allowed origins for CORS
 const allowed_origins = [
-  "https://admin.haniflix.com",
-  "http://admin.haniflix.com",
-  "https://haniflix.com",
-  "http://haniflix.com",
-  "https://www.haniflix.com",
-  "http://www.haniflix.com",
+  "https://admin.haniflix.stream",
+  "http://admin.haniflix.stream",
+  "https://haniflix.stream",
+  "http://haniflix.stream",
+  "https://www.haniflix.stream",
+  "http://www.haniflix.stream",
 ];
 // CORS configuration
 const corsOptions = {

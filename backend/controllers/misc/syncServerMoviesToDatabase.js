@@ -20,8 +20,8 @@ const syncServerMoviesToDatabase = async (req, res) => {
 
     try {
       const params = {
-        Bucket: 'haniflix-data-bucket',
-        Prefix: 'cdn.haniflix.com/movies/' // Adjust this based on your bucket structure
+        Bucket: 'web-bucket13424',
+        Prefix: 'movies/' // Adjust this based on your bucket structure
       };
   
       const s3Objects = await s3.listObjectsV2(params).promise();
@@ -57,7 +57,7 @@ const syncServerMoviesToDatabase = async (req, res) => {
   
         if (!existingMovie) {
           existingMovie = await Movie.findOne({
-            video: 'https://' + s3Object.Key
+            video: `https://web-bucket13424.s3.us-east-2.amazonaws.com/${encodeURIComponent(s3Object.Key)}`
           });
         }
   
@@ -68,7 +68,7 @@ const syncServerMoviesToDatabase = async (req, res) => {
   
         const movie = new Movie({
           title: title,
-          video: 'https://' + s3Object.Key,
+          video: `https://web-bucket13424.s3.us-east-2.amazonaws.com/${encodeURIComponent(s3Object.Key)}`,
           year: year,
         });
         await movie.save();
