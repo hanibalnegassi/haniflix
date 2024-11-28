@@ -1,6 +1,6 @@
 {
   "name": "new",
-  "homepage": "https://haniflix.com/",
+  "homepage": "https://haniflix.net/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -60,7 +60,7 @@
     "yup": "^1.3.3"
   },
   "scripts": {
-    "start": "vite --host",
+    "start": "vite --host --port 8001",
     "build": "vite build --mode production",
     "preview": "vite preview"
   },

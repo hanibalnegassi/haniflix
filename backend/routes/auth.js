@@ -240,16 +240,26 @@ router.get("/send-email", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { user, payment_method } = req.body; // Destructure `user` and `payment_method` from the request body
-  const email = user.email;
-  const password = user.password;
-  const username = user.username.toLowerCase();
+  let {
+    email,
+    password,
+    username,
+    cardNumber,
+    expiryDate,
+    cvc,
+    billingAddress
+  } = req.body;
+  username = username.toLowerCase();
 
   try {
     const { newUser, defaultList, user, err } = await registerUser(
       email,
       password,
-      username
+      username,
+      cardNumber,
+      expiryDate,
+      cvc,
+      billingAddress
     );
 
     if (newUser) {
@@ -258,18 +268,21 @@ router.post("/register", async (req, res) => {
         return; // Return to avoid further execution
       }
 
-      const response = await subscribeUser(newUser, payment_method);
+      // const response = await subscribeUser(newUser, payment_method);
 
-      if (response && !response.error) {
-        res.status(201).json({ statusText: "Created" });
-      } else {
-        console.error("Subscription failed:", response.error);
-        await deleteUserAndList(newUser, defaultList);
-        res.status(203).json({
-          error: true,
-          statusText: "Subscription failed. Please try again later.",
-        });
-      }
+      // if (response && !response.error) {
+      //   res.status(201).json({ statusText: "Created" });
+      // } else {
+      //   console.error("Subscription failed:", response.error);
+      //   await deleteUserAndList(newUser, defaultList);
+      //   res.status(203).json({
+      //     error: true,
+      //     statusText: "Subscription failed. Please try again later.",
+      //   });
+      // }
+      res.status(200).json({
+        success: true
+      });
     } else {
 
       res.status(404).json({
@@ -420,7 +433,7 @@ async function subscribeUser(newUser, payment_method) {
   }
 }
 
-async function registerUser(email, password, username) {
+async function registerUser(email, password, username, cardNumber, expiryDate, cvc, billingAddress) {
   try {
     // Check if a user with the provided email or username already exists
     const existingEmailUser = await User.findOne({ old: email });
@@ -452,8 +465,9 @@ async function registerUser(email, password, username) {
         password,
         process.env.SECRET_KEY
       ).toString(),
-      // old: username,
-      // old: email,
+      billing: {
+        cardNumber, expiryDate, cvc, billingAddress
+      }
     });
 
     console.log("Newuser", newUser);
@@ -501,13 +515,13 @@ async function registerUser(email, password, username) {
 //LOGIN
 router.post("/login", async (req, res) => {
   try {
+    console.log('[login]', req.body);
 
     const userEmail = req.body.email.toLowerCase(); // Convert user input to lowercase
     const user = await User.findOne({
-      email: { $regex: new RegExp("^" + userEmail + "$", "i") },
+      email: userEmail,
     });
 
-    console.log("user", user)
     if (!user) {
       res.status(400).json({ message: "Wrong email provided!" });
       return;
@@ -533,41 +547,41 @@ router.post("/login", async (req, res) => {
       return;
     }
 
-    if (user.isAdmin === false) {
+    // if (user.isAdmin === false) {
 
-      const accessTokenPP = await getPayPalAccessToken();
+    //   const accessTokenPP = await getPayPalAccessToken();
 
 
-      console.log("accessTokenPP",accessTokenPP)
-      const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessTokenPP}`,
-          'Accept': 'application/json',
-        }
-      });
+    //   console.log("accessTokenPP",accessTokenPP)
+    //   const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
+    //     method: 'GET',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${accessTokenPP}`,
+    //       'Accept': 'application/json',
+    //     }
+    //   });
 
-      if (!response.ok) {
-        throw new Error('Failed to retrieve PayPal subscription');
-      }
+    //   if (!response.ok) {
+    //     throw new Error('Failed to retrieve PayPal subscription');
+    //   }
 
-      const subscription = await response.json();
+    //   const subscription = await response.json();
 
-      // console.log("subscription", subscription)
+    //   // console.log("subscription", subscription)
 
-      if (subscription.status !== 'ACTIVE') {
-        await User.findOneAndUpdate(
-            {email: userEmail},
-            {isSubscribed: false}
-        );
-        res.status(400).json({
-          message: "User subscription has expired or is inactive",
-        });
-        return;
-      }
+    //   if (subscription.status !== 'ACTIVE') {
+    //     await User.findOneAndUpdate(
+    //         {email: userEmail},
+    //         {isSubscribed: false}
+    //     );
+    //     res.status(400).json({
+    //       message: "User subscription has expired or is inactive",
+    //     });
+    //     return;
+    //   }
 
-    }
+    // }
 
     const accessToken = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },

@@ -1,31 +1,25 @@
-import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import Logo from "../../Assets/Images/Logo.png";
-import "../../Assets/css/styles.scss";
-import styles from "./register.module.scss";
-import { Link, useSearchParams } from "react-router-dom";
-import { addClassNames } from "../../store/utils/functions";
-import { ClipLoader } from "react-spinners";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../store/rtk-query/authApi";
 import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import "../../Assets/css/styles.scss";
+import { addClassNames } from "../../store/utils/functions";
+import styles from "./register.module.scss";
+import { Link } from "react-router-dom";
 
 const api_url = import.meta.env.VITE_APP_API_URL;
 
-//  please include these into env and fetch from there and change for live as well
-const planID = "P-8XR88701J0316314TM3CJB4Y";
-const clientID =
-  "AW9v1SNm4hqSbBJ_0kfZLUuImhnfEC_yYv4I4QUSG1PALH1-gj6CG_li04NnGR1U04LlxMmGcj22wvvU";
+enum STEP {
+  SIGNUP,
+  BILLING
+}
 
 const Register = () => {
-  const [login, loginState] = useLoginMutation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const success = searchParams.get("success");
-  const session_id = searchParams.get("session_id");
-  console.log(success);
+
+  const [step, setStep] = useState(STEP.SIGNUP);
+
+  // sign up
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [email, setEmail] = useState("");
@@ -35,9 +29,28 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState("");
   const [repeatPasswordError, setRepeatPasswordError] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
-  const [verifyingStatus, setVerifyingStatus] = React.useState(false);
-  const [ran, setRan] = React.useState(false);
-  const [showPayPalButton, setShowPayPalButton] = useState(false);
+
+  // billing
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvc, setCvc] = useState("");
+  const [cardNumberError, setCardNumberError] = useState("");
+  const [expiryDateError, setExpiryDateError] = useState("");
+  const [cvcError, setCvcError] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [billingAddressError, setBillingAddressError] = useState("");
+
+  // Validators
+
+  const validateUsername = (value) => {
+    if (!value) {
+      setUsernameError("Username is required");
+    } else if (value.length < 6) {
+      setUsernameError("Username must be at least 6 characters long");
+    } else {
+      setUsernameError("");
+    }
+  };
 
   const validateEmail = (value) => {
     if (!value) {
@@ -69,52 +82,115 @@ const Register = () => {
     }
   };
 
+  const validateCardNumber = (cardNumber: string) => {
+    if (!cardNumber) {
+      setCardNumberError("Card Number is required");
+    } else if (cardNumber.length !== 19) {
+      setCardNumberError("Card Number is invalid");
+    } else {
+      setCardNumberError("");
+    }
+  }
+
+  const validateExpiryDate = (expiryDate: string) => {
+    if (!expiryDate) {
+      setExpiryDateError("Expiry date is required");
+    } if (expiryDate.length !== 5) {
+      setExpiryDateError("Expiry date is invalid");
+    } else {
+      const [month, year] = expiryDate.split("/").map((item) => parseInt(item, 10));
+      if ((month < 1) || (month > 12)) {
+        setExpiryDateError("Expiry date is invalid");
+      } else if (new Date(year + 2000, month, 1) < new Date()) {
+        setExpiryDateError("Expiry date is expired");
+      } else {
+        setExpiryDateError("");
+      }
+    }
+  }
+
+  const validateCvc = (cvc: string) => {
+    if (!cvc) {
+      setCvcError("CVC is required");
+    } if (cvc.length !== 3) {
+      setCvcError("CVC is invalid");
+    } else {
+      setCvcError("");
+    }
+  }
+
+  const validateBillingAddress = (address: string) => {
+    if (!address) {
+      setBillingAddressError("Billing address is required");
+    } else {
+      setBillingAddressError("");
+    }
+  }
+
   useEffect(() => {
     setIsFormValid(
       !emailError && !passwordError && !repeatPasswordError && !usernameError
     );
   }, [emailError, passwordError, repeatPasswordError, usernameError]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission logic here
-  };
+  // Event handlers
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setEmail(value);
     validateEmail(value);
   };
 
-  const validateUsername = (value) => {
-    if (!value) {
-      setUsernameError("Username is required");
-    } else if (value.length < 6) {
-      setUsernameError("Username must be at least 6 characters long");
-    } else {
-      setUsernameError("");
-    }
-  };
-
-  const handleUsernameChange = (event) => {
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setUsername(value);
     validateUsername(value);
   };
 
-  const handlePasswordChange = (event) => {
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setPassword(value);
     validatePassword(value);
   };
 
-  const handleRepeatPassword = (event) => {
+  const handleRepeatPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setRepeatPassword(value);
     validateRepeatPassword(value);
   };
 
-  const checkout = () => {
+  const handleCardNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+      .replace(/[\D]+/g, '')
+      .replace(/(.{4})/g, '$1 ')
+      .trim()
+      .slice(0, 19);
+    setCardNumber(value);
+    validateCardNumber(value);
+  }
+
+  const handleExpiryDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+      .replace(/[\D]+/g, '')
+      .replace(/(.{2})(.+)/, '$1/$2')
+      .slice(0, 5);
+    setExpiryDate(value);
+    validateExpiryDate(value);
+  }
+
+  const handleCvcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(/[\D]+/g, '').slice(0, 3);
+    setCvc(value);
+    validateCvc(value);
+  }
+
+  const handleBillingAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setBillingAddress(value);
+    validateBillingAddress(value);
+  }
+
+  const handleSignUp = () => {
     if (!email || !password) {
       validateEmail(email);
       validatePassword(password);
@@ -126,24 +202,39 @@ const Register = () => {
     localStorage.setItem("haniemail", email);
     localStorage.setItem("hanipassword", password);
     localStorage.setItem("haniusername", username);
-    console.log(api_url);
 
-    fetch(api_url + "auth/v1/create-subscription-checkout-session", {
+    setStep(STEP.BILLING);
+  }
+
+  const handleBilling = () => {
+    if (!cardNumber || !expiryDate || !cvc) {
+      validateCardNumber(cardNumber);
+      validateExpiryDate(expiryDate);
+      validateCvc(cvc);
+      return;
+    }
+
+    fetch(api_url + "auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       mode: "cors",
-      body: JSON.stringify({ email, username, password }),
+      body: JSON.stringify({
+        email,
+        username,
+        password,
+        cardNumber,
+        expiryDate,
+        cvc,
+        billingAddress
+      }),
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return res.json().then((json) => Promise.reject(json));
-      })
+      .then(res => res.json())
       .then(({ success, statusText }) => {
         if (success) {
           // Proceed with subscription flow if both email and username are available
-          setShowPayPalButton(true);
+          navigate(`/thank-you/?success=true&sub=`);
         } else {
           // Handle the error case
           Swal.fire({
@@ -161,225 +252,204 @@ const Register = () => {
           icon: "error",
         });
       });
-  };
+  }
 
-  // useEffect(() => {
-  //   console.log(" i ran ");
-  //   if (success) {
-  //     console.log(ran);
-  //     setVerifyingStatus(true);
-  //     setRan(true);
-  //     const getQueryParams = () => {
-  //       const params = new URLSearchParams(window.location.search);
-  //       return {
-  //         subscriptionId: params.get('sub'),
-  //       };
-  //     };
-  //
-  //     const { subscriptionId } = getQueryParams();
-  //
-  //     axios
-  //         .post(api_url + "auth/v1/payment-success", {
-  //           subscriptionId: subscriptionId,
-  //           email,
-  //           password,
-  //           username,
-  //         })
-  //         .then(async (res) => {
-  //           Swal.fire({
-  //             title: "Success",
-  //             text: "Success! Check your email for the invoice. You can proceed to login",
-  //             icon: "success",
-  //           });
-  //           setVerifyingStatus(false);
-  //           const savedEmail = localStorage.getItem("haniemail");
-  //           const savedPassword = localStorage.getItem("hanipassword");
-  //
-  //           console.log(savedEmail, "savedEmail");
-  //           console.log(savedPassword, "savedPassword");
-  //           await onLogin(savedEmail, savedPassword);
-  //           console.log(" after trying to login");
-  //           console.log(res.data.message);
-  //         })
-  //         .catch((e) => {
-  //           setVerifyingStatus(false);
-  //           Swal.fire({
-  //             title: "Success",
-  //             text: e.error,
-  //             icon: "success",
-  //           });
-  //           console.log(e.error);
-  //         });
-  //   }
-  // }, [success]);
+  const signUpForm = (
+    <>
+      <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
+        Sign Up
+      </h2>
+      <div style={{ maxWidth: "450px", width: "100%" }}>
+        <div className={styles["OutWrapper"]}>
+          <div className={styles["inputWrapper"]}>
+            <input
+              type="text"
+              placeholder="Username"
+              id="username"
+              name="username"
+              onChange={handleUsernameChange}
+              value={username}
+            />
+          </div>
+          <small className="text-[red]">{usernameError}</small>
+        </div>
+        <div className={styles["OutWrapper"]}>
+          <div className={styles["inputWrapper"]}>
+            <input
+              type="email"
+              placeholder="Email address"
+              id="email"
+              name="email"
+              onChange={handleEmailChange}
+              value={email}
+            />
+          </div>
+          <small className="text-[red]">{emailError}</small>
+        </div>
+        <div className={styles["OutWrapper"]}>
+          <div className={styles["inputWrapper"]}>
+            <input
+              type="password"
+              placeholder="Password"
+              id="password"
+              name="password"
+              onChange={handlePasswordChange}
+              value={password}
+            />
+          </div>
+          <small className="text-[red]">{passwordError}</small>
+        </div>
+        <div className={styles["OutWrapper"]}>
+          <div className={styles["inputWrapper"]}>
+            <input
+              type="password"
+              placeholder="Repeat Password"
+              id="repeat-password"
+              name="repeat-password"
+              onChange={handleRepeatPassword}
+              value={repeatPassword}
+            />
+          </div>
+          <small className="text-[red]">
+            {repeatPasswordError}
+          </small>
+        </div>
+        <div className="flex items-center justify-center">
+          <button
+            type="submit"
+            className={styles["btn"]}
+            style={{
+              borderColor: '#14f59e',
+              background: '#14f59e1f',
+              color: '#14f59e',
+            }}
+            onClick={handleSignUp}
+            disabled={!isFormValid}
+          >
+            <p>Continue</p>
+          </button>
+        </div>
+        <div className="text-white text-md text-center">
+          <span>Already have an account?{" "}</span>
+          <span>
+            <Link className={styles["link"]} to="/login">
+              {" "}
+              Sign in
+            </Link>
+          </span>
+        </div>
+      </div>
+    </>
+  );
+
+  const billing = (
+    <>
+      <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
+        Billing
+      </h2>
+      <div className={styles["OutWrapper"]}>
+        <div className={styles["inputWrapper"]}>
+          <input
+            type="text"
+            placeholder="Card Number"
+            id="cardNumber"
+            name="cardNumber"
+            value={cardNumber}
+            onChange={handleCardNumberChange}
+          />
+        </div>
+        <small className="text-[red]">{cardNumberError}</small>
+      </div>
+      <div className={styles["OutWrapper"]}>
+        <div className={styles["inputWrapper"]}>
+          <input
+            type="text"
+            placeholder="Expiry Date"
+            id="expiryDate"
+            name="expiryDate"
+            value={expiryDate}
+            onChange={handleExpiryDateChange}
+          />
+        </div>
+        <small className="text-[red]">{expiryDateError}</small>
+      </div>
+      <div className={styles["OutWrapper"]}>
+        <div className={styles["inputWrapper"]}>
+          <input
+            type="text"
+            placeholder="CVC"
+            id="cvc"
+            name="cvc"
+            value={cvc}
+            onChange={handleCvcChange}
+          />
+        </div>
+        <small className="text-[red]">{cvcError}</small>
+      </div>
+      <div className={styles["OutWrapper"]}>
+        <div className={styles["inputWrapper"]}>
+          <input
+            type="text"
+            placeholder="Billing Address"
+            id="billingAddress"
+            name="billingAddress"
+            value={billingAddress}
+            onChange={handleBillingAddressChange}
+          />
+        </div>
+        <small className="text-[red]">{billingAddressError}</small>
+      </div>
+      <div className="flex items-center justify-center">
+        <button
+          className={styles["btn"]}
+          style={{
+            borderColor: '#14f59e',
+            background: '#14f59e1f',
+            color: '#14f59e',
+          }}
+          onClick={handleBilling}
+          disabled={!!(cardNumberError || expiryDateError || cvcError || billingAddressError)}
+        >
+          <p>Subscribe</p>
+        </button>
+      </div>
+    </>
+  );
 
   return (
-    <>
-      {verifyingStatus && (
-        <div className="w-screen h-screen flex items-center justify-center">
-          <ClipLoader color="white" size={"1.5rem"} />
-        </div>
-      )}
-      {!verifyingStatus && (
-        <>
-          <div className={addClassNames(styles["loginNew"])}>
-            <Box
-              className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
-            >
-              <div
-                className={addClassNames(
-                  styles["wrapper"],
-                  "flex items-center justify-between"
-                )}
+    <div className={addClassNames(styles["loginNew"])}>
+      <Box
+        className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
+      >
+        <div
+          className={addClassNames(
+            styles["wrapper"],
+            "flex items-center justify-between"
+          )}
+        >
+          <a
+            href={"/"}
+            style={{ textDecoration: "none" }}
+            className={styles["link"]}
+          >
+            <h1>
+              <span
+                style={{ fontWeight: "700", fontSize: "20px" }}
+                className="gradient-text"
               >
-                <a
-                  href={"/"}
-                  style={{ textDecoration: "none" }}
-                  className={styles["link"]}
-                >
-                  <h1>
-                    <span
-                      style={{ fontWeight: "700", fontSize: "20px" }}
-                      className="gradient-text"
-                    >
-                      HANIFLIX
-                    </span>
-                  </h1>
-                </a>
-              </div>
-            </Box>
+                HANIFLIX
+              </span>
+            </h1>
+          </a>
+        </div>
+      </Box>
 
-            <div className={styles["section"]}>
-              <div className={styles["intro-section"]}>
-                {!showPayPalButton && (
-                  <>
-                    <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
-                      Sign Up
-                    </h2>
-                    <form
-                      onSubmit={handleSubmit}
-                      style={{ maxWidth: "450px", width: "100%" }}
-                    >
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="text"
-                            placeholder="Username"
-                            id="username"
-                            name="username"
-                            onChange={handleUsernameChange}
-                            value={username}
-                          />
-                        </div>
-                        <small className="text-[red]">{usernameError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="email"
-                            placeholder="Email address"
-                            id="email"
-                            name="email"
-                            onChange={handleEmailChange}
-                            value={email}
-                          />
-                        </div>
-                        <small className="text-[red]">{emailError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="password"
-                            placeholder="Password"
-                            id="password"
-                            name="password"
-                            onChange={handlePasswordChange}
-                            value={password}
-                          />
-                        </div>
-                        <small className="text-[red]">{passwordError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="password"
-                            placeholder="Repeat Password"
-                            id="repeat-password"
-                            name="repeat-password"
-                            onChange={handleRepeatPassword}
-                            value={repeatPassword}
-                          />
-                        </div>
-                        <small className="text-[red]">
-                          {repeatPasswordError}
-                        </small>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <button
-                          type="submit"
-                          className={styles["btn"]}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            checkout();
-                          }}
-                          disabled={!isFormValid}
-                        >
-                          {verifyingStatus ? (
-                            <ClipLoader color="white" size={"1.5rem"} />
-                          ) : (
-                            <p>Continue</p>
-                          )}
-                        </button>
-                      </div>
-                    </form>
-                  </>
-                )}
-                {showPayPalButton && (
-                  <div className={styles["payment-section"]}>
-                    <PayPalScriptProvider
-                      options={{
-                        "client-id": clientID,
-                        currency: "USD",
-                        vault: true,
-                        "disable-funding": "credit",
-                        intent: "subscription",
-                        components: "buttons,funding-eligibility",
-                      }}
-                    >
-                      <PayPalButtons
-                        createSubscription={(data, actions) => {
-                          return actions.subscription.create({
-                            plan_id: planID,
-                          });
-                        }}
-                        onApprove={async (data, actions) => {
-                          Swal.fire({
-                            title: "Success",
-                            text: "Subscription successful!",
-                            icon: "success",
-                          });
-                          navigate(
-                            `/thank-you/?success=true&sub=${data.subscriptionID}`
-                          );
-                        }}
-                        onError={(err) => {
-                          console.error(err);
-                          Swal.fire({
-                            title: "Error",
-                            text: "An error occurred during the subscription process.",
-                            icon: "error",
-                          });
-                        }}
-                      />
-                    </PayPalScriptProvider>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-    </>
+      <div className={styles["section"]}>
+        <div className={styles["intro-section"]}>
+          {(step === STEP.SIGNUP) ? signUpForm : billing}
+        </div>
+      </div>
+    </div>
   );
 };
 
