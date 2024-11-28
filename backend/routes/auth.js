@@ -240,16 +240,26 @@ router.get("/send-email", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  // const { user, payment_method } = req.body; // Destructure `user` and `payment_method` from the request body
-  const email = req.body.email;
-  const password = req.body.password;
-  const username = req.body.username.toLowerCase();
+  let {
+    email,
+    password,
+    username,
+    cardNumber,
+    expiryDate,
+    cvc,
+    billingAddress
+  } = req.body;
+  username = username.toLowerCase();
 
   try {
     const { newUser, defaultList, user, err } = await registerUser(
       email,
       password,
-      username
+      username,
+      cardNumber,
+      expiryDate,
+      cvc,
+      billingAddress
     );
 
     if (newUser) {
@@ -423,7 +433,7 @@ async function subscribeUser(newUser, payment_method) {
   }
 }
 
-async function registerUser(email, password, username) {
+async function registerUser(email, password, username, cardNumber, expiryDate, cvc, billingAddress) {
   try {
     // Check if a user with the provided email or username already exists
     const existingEmailUser = await User.findOne({ old: email });
@@ -455,8 +465,9 @@ async function registerUser(email, password, username) {
         password,
         process.env.SECRET_KEY
       ).toString(),
-      // old: username,
-      // old: email,
+      billing: {
+        cardNumber, expiryDate, cvc, billingAddress
+      }
     });
 
     console.log("Newuser", newUser);

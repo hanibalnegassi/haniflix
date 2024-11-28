@@ -23,6 +23,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    billing: {
+      cardNumber: String,
+      expiryDate: String,
+      cvc: String,
+      billingAddress: String
+    }
   },
   { timestamps: true }
 );
