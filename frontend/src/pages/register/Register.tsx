@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import Logo from "../../Assets/Images/Logo.png";
-import "../../Assets/css/styles.scss";
-import styles from "./register.module.scss";
-import { Link, useSearchParams } from "react-router-dom";
-import { addClassNames } from "../../store/utils/functions";
-import { ClipLoader } from "react-spinners";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../store/rtk-query/authApi";
 import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import "../../Assets/css/styles.scss";
+import { addClassNames } from "../../store/utils/functions";
+import styles from "./register.module.scss";
 
 const api_url = import.meta.env.VITE_APP_API_URL;
 
-//  please include these into env and fetch from there and change for live as well
-const planID = "P-8XR88701J0316314TM3CJB4Y";
-const clientID =
-  "AW9v1SNm4hqSbBJ_0kfZLUuImhnfEC_yYv4I4QUSG1PALH1-gj6CG_li04NnGR1U04LlxMmGcj22wvvU";
-
 const Register = () => {
-  const [login, loginState] = useLoginMutation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const success = searchParams.get("success");
-  const session_id = searchParams.get("session_id");
-  console.log(success);
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [email, setEmail] = useState("");
@@ -35,9 +19,6 @@ const Register = () => {
   const [passwordError, setPasswordError] = useState("");
   const [repeatPasswordError, setRepeatPasswordError] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
-  const [verifyingStatus, setVerifyingStatus] = React.useState(false);
-  const [ran, setRan] = React.useState(false);
-  const [showPayPalButton, setShowPayPalButton] = useState(false);
 
   const validateEmail = (value) => {
     if (!value) {
@@ -114,6 +95,7 @@ const Register = () => {
     validateRepeatPassword(value);
   };
 
+  // click on sign up
   const checkout = () => {
     if (!email || !password) {
       validateEmail(email);
@@ -128,7 +110,7 @@ const Register = () => {
     localStorage.setItem("haniusername", username);
     console.log(api_url);
 
-    fetch(api_url + "auth/v1/create-subscription-checkout-session", {
+    fetch(api_url + "auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -137,13 +119,14 @@ const Register = () => {
       body: JSON.stringify({ email, username, password }),
     })
       .then((res) => {
+        console.log(res);
         if (res.ok) return res.json();
         return res.json().then((json) => Promise.reject(json));
       })
       .then(({ success, statusText }) => {
         if (success) {
           // Proceed with subscription flow if both email and username are available
-          setShowPayPalButton(true);
+          navigate(`/thank-you/?success=true&sub=`);
         } else {
           // Handle the error case
           Swal.fire({
@@ -163,223 +146,114 @@ const Register = () => {
       });
   };
 
-  // useEffect(() => {
-  //   console.log(" i ran ");
-  //   if (success) {
-  //     console.log(ran);
-  //     setVerifyingStatus(true);
-  //     setRan(true);
-  //     const getQueryParams = () => {
-  //       const params = new URLSearchParams(window.location.search);
-  //       return {
-  //         subscriptionId: params.get('sub'),
-  //       };
-  //     };
-  //
-  //     const { subscriptionId } = getQueryParams();
-  //
-  //     axios
-  //         .post(api_url + "auth/v1/payment-success", {
-  //           subscriptionId: subscriptionId,
-  //           email,
-  //           password,
-  //           username,
-  //         })
-  //         .then(async (res) => {
-  //           Swal.fire({
-  //             title: "Success",
-  //             text: "Success! Check your email for the invoice. You can proceed to login",
-  //             icon: "success",
-  //           });
-  //           setVerifyingStatus(false);
-  //           const savedEmail = localStorage.getItem("haniemail");
-  //           const savedPassword = localStorage.getItem("hanipassword");
-  //
-  //           console.log(savedEmail, "savedEmail");
-  //           console.log(savedPassword, "savedPassword");
-  //           await onLogin(savedEmail, savedPassword);
-  //           console.log(" after trying to login");
-  //           console.log(res.data.message);
-  //         })
-  //         .catch((e) => {
-  //           setVerifyingStatus(false);
-  //           Swal.fire({
-  //             title: "Success",
-  //             text: e.error,
-  //             icon: "success",
-  //           });
-  //           console.log(e.error);
-  //         });
-  //   }
-  // }, [success]);
-
   return (
-    <>
-      {verifyingStatus && (
-        <div className="w-screen h-screen flex items-center justify-center">
-          <ClipLoader color="white" size={"1.5rem"} />
-        </div>
-      )}
-      {!verifyingStatus && (
-        <>
-          <div className={addClassNames(styles["loginNew"])}>
-            <Box
-              className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
-            >
-              <div
-                className={addClassNames(
-                  styles["wrapper"],
-                  "flex items-center justify-between"
-                )}
+    <div className={addClassNames(styles["loginNew"])}>
+      <Box
+        className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
+      >
+        <div
+          className={addClassNames(
+            styles["wrapper"],
+            "flex items-center justify-between"
+          )}
+        >
+          <a
+            href={"/"}
+            style={{ textDecoration: "none" }}
+            className={styles["link"]}
+          >
+            <h1>
+              <span
+                style={{ fontWeight: "700", fontSize: "20px" }}
+                className="gradient-text"
               >
-                <a
-                  href={"/"}
-                  style={{ textDecoration: "none" }}
-                  className={styles["link"]}
-                >
-                  <h1>
-                    <span
-                      style={{ fontWeight: "700", fontSize: "20px" }}
-                      className="gradient-text"
-                    >
-                      HANIFLIX
-                    </span>
-                  </h1>
-                </a>
-              </div>
-            </Box>
+                HANIFLIX
+              </span>
+            </h1>
+          </a>
+        </div>
+      </Box>
 
-            <div className={styles["section"]}>
-              <div className={styles["intro-section"]}>
-                {!showPayPalButton && (
-                  <>
-                    <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
-                      Sign Up
-                    </h2>
-                    <form
-                      onSubmit={handleSubmit}
-                      style={{ maxWidth: "450px", width: "100%" }}
-                    >
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="text"
-                            placeholder="Username"
-                            id="username"
-                            name="username"
-                            onChange={handleUsernameChange}
-                            value={username}
-                          />
-                        </div>
-                        <small className="text-[red]">{usernameError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="email"
-                            placeholder="Email address"
-                            id="email"
-                            name="email"
-                            onChange={handleEmailChange}
-                            value={email}
-                          />
-                        </div>
-                        <small className="text-[red]">{emailError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="password"
-                            placeholder="Password"
-                            id="password"
-                            name="password"
-                            onChange={handlePasswordChange}
-                            value={password}
-                          />
-                        </div>
-                        <small className="text-[red]">{passwordError}</small>
-                      </div>
-                      <div className={styles["OutWrapper"]}>
-                        <div className={styles["inputWrapper"]}>
-                          <input
-                            type="password"
-                            placeholder="Repeat Password"
-                            id="repeat-password"
-                            name="repeat-password"
-                            onChange={handleRepeatPassword}
-                            value={repeatPassword}
-                          />
-                        </div>
-                        <small className="text-[red]">
-                          {repeatPasswordError}
-                        </small>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <button
-                          type="submit"
-                          className={styles["btn"]}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            checkout();
-                          }}
-                          disabled={!isFormValid}
-                        >
-                          {verifyingStatus ? (
-                            <ClipLoader color="white" size={"1.5rem"} />
-                          ) : (
-                            <p>Continue</p>
-                          )}
-                        </button>
-                      </div>
-                    </form>
-                  </>
-                )}
-                {showPayPalButton && (
-                  <div className={styles["payment-section"]}>
-                    <PayPalScriptProvider
-                      options={{
-                        "client-id": clientID,
-                        currency: "USD",
-                        vault: true,
-                        "disable-funding": "credit",
-                        intent: "subscription",
-                        components: "buttons,funding-eligibility",
-                      }}
-                    >
-                      <PayPalButtons
-                        createSubscription={(data, actions) => {
-                          return actions.subscription.create({
-                            plan_id: planID,
-                          });
-                        }}
-                        onApprove={async (data, actions) => {
-                          Swal.fire({
-                            title: "Success",
-                            text: "Subscription successful!",
-                            icon: "success",
-                          });
-                          navigate(
-                            `/thank-you/?success=true&sub=${data.subscriptionID}`
-                          );
-                        }}
-                        onError={(err) => {
-                          console.error(err);
-                          Swal.fire({
-                            title: "Error",
-                            text: "An error occurred during the subscription process.",
-                            icon: "error",
-                          });
-                        }}
-                      />
-                    </PayPalScriptProvider>
-                  </div>
-                )}
+      <div className={styles["section"]}>
+        <div className={styles["intro-section"]}>
+          <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
+            Sign Up
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            style={{ maxWidth: "450px", width: "100%" }}
+          >
+            <div className={styles["OutWrapper"]}>
+              <div className={styles["inputWrapper"]}>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  id="username"
+                  name="username"
+                  onChange={handleUsernameChange}
+                  value={username}
+                />
               </div>
+              <small className="text-[red]">{usernameError}</small>
             </div>
-          </div>
-        </>
-      )}
-    </>
+            <div className={styles["OutWrapper"]}>
+              <div className={styles["inputWrapper"]}>
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  id="email"
+                  name="email"
+                  onChange={handleEmailChange}
+                  value={email}
+                />
+              </div>
+              <small className="text-[red]">{emailError}</small>
+            </div>
+            <div className={styles["OutWrapper"]}>
+              <div className={styles["inputWrapper"]}>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  id="password"
+                  name="password"
+                  onChange={handlePasswordChange}
+                  value={password}
+                />
+              </div>
+              <small className="text-[red]">{passwordError}</small>
+            </div>
+            <div className={styles["OutWrapper"]}>
+              <div className={styles["inputWrapper"]}>
+                <input
+                  type="password"
+                  placeholder="Repeat Password"
+                  id="repeat-password"
+                  name="repeat-password"
+                  onChange={handleRepeatPassword}
+                  value={repeatPassword}
+                />
+              </div>
+              <small className="text-[red]">
+                {repeatPasswordError}
+              </small>
+            </div>
+            <div className="flex items-center justify-center">
+              <button
+                type="submit"
+                className={styles["btn"]}
+                onClick={(e) => {
+                  e.preventDefault();
+                  checkout();
+                }}
+                disabled={!isFormValid}
+              >
+                <p>Continue</p>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 };
 

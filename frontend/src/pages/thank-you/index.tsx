@@ -68,39 +68,18 @@ const ThankYouPage = () => {
         };
       };
 
-      const { subscriptionId } = getQueryParams();
-      axios
-        .post(api_url + "auth/v1/payment-success", {
-          subscriptionId: subscriptionId,
-          email,
-          password,
-          username,
-        })
-        .then(async (res) => {
-          // alert();
-          Swal.fire({
-            title: "Success",
-            text: "Success! Check your email for the invoice. You can proceed to login",
-            icon: "success",
-          });
-          const savedEmail = localStorage.getItem("haniemail");
-          const savedPassword = localStorage.getItem("hanipassword");
+      Swal.fire({
+        title: "Success",
+        text: "Success! Check your email for the invoice. You can proceed to login",
+        icon: "success",
+      });
+      const savedEmail = localStorage.getItem("haniemail");
+      const savedPassword = localStorage.getItem("hanipassword");
 
-          console.log(savedEmail, "savedEmail");
-          console.log(savedPassword, "savedPassword");
-          await onLogin(savedEmail, savedPassword);
-          console.log(" after trying to login");
-          console.log(res.data.message);
-        })
-
-        .catch((e) => {
-          Swal.fire({
-            title: "Success",
-            text: e.error,
-            icon: "success",
-          });
-          console.log(e.error);
-        });
+      console.log(savedEmail, "savedEmail");
+      console.log(savedPassword, "savedPassword");
+      onLogin(savedEmail, savedPassword);
+      console.log(" after trying to login");
     }
   }, []);
 

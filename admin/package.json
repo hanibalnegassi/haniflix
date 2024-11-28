@@ -50,7 +50,7 @@
     "web-vitals": "2.1.4"
   },
   "scripts": {
-    "start": "vite",
+    "start": "vite --host --port 8002",
     "build": "vite build --mode production",
     "serve": "vite preview",
     "eject": "react-scripts eject",

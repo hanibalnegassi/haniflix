@@ -25,25 +25,15 @@ const webhookRoute = require("./routes/webhook");
 
 // Allowed origins for CORS
 const allowed_origins = [
-  "https://admin.haniflix.stream",
-  "http://admin.haniflix.stream",
-  "https://haniflix.stream",
-  "http://haniflix.stream",
-  "https://www.haniflix.stream",
-  "http://www.haniflix.stream",
+  "https://admin.haniflix.net",
+  "https://haniflix.net",
 ];
 // CORS configuration
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowed_origins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*', // Or specify allowed origins
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization", "token"],
-  credentials: true
+  credentials: true,
 };
 
 // Express app and server setup
@@ -53,7 +43,7 @@ const server = http.createServer(app);
 
 const io = socketio(server, {
   cors: {
-    origin: allowed_origins,
+    origin: true,
     methods: ["GET", "POST"],
     allowedHeaders: ["token"],
     credentials: true,

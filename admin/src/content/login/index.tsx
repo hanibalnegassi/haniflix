@@ -62,8 +62,9 @@ function Login() {
     try {
       const res = await login(credentials)
 
-      console.log(res);
-
+      if (res['data']) {
+        dispatch(setUser(res['data']));
+      }
 
       if (res?.data?.isAdmin && res?.data?.isAdmin !== true) {
         setError('Only administrators can login here');
