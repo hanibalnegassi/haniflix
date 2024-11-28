@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import "../../Assets/css/styles.scss";
 import { addClassNames } from "../../store/utils/functions";
 import styles from "./register.module.scss";
+import { Link } from "react-router-dom";
 
 const api_url = import.meta.env.VITE_APP_API_URL;
 
@@ -317,11 +318,25 @@ const Register = () => {
           <button
             type="submit"
             className={styles["btn"]}
+            style={{
+              borderColor: '#14f59e',
+              background: '#14f59e1f',
+              color: '#14f59e',
+            }}
             onClick={handleSignUp}
             disabled={!isFormValid}
           >
             <p>Continue</p>
           </button>
+        </div>
+        <div className="text-white text-md text-center">
+          <span>Already have an account?{" "}</span>
+          <span>
+            <Link className={styles["link"]} to="/login">
+              {" "}
+              Sign in
+            </Link>
+          </span>
         </div>
       </div>
     </>
@@ -387,6 +402,11 @@ const Register = () => {
       <div className="flex items-center justify-center">
         <button
           className={styles["btn"]}
+          style={{
+            borderColor: '#14f59e',
+            background: '#14f59e1f',
+            color: '#14f59e',
+          }}
           onClick={handleBilling}
           disabled={!!(cardNumberError || expiryDateError || cvcError || billingAddressError)}
         >
