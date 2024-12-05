@@ -6,6 +6,10 @@ import "../../Assets/css/styles.scss";
 import { addClassNames } from "../../store/utils/functions";
 import styles from "./register.module.scss";
 import { Link } from "react-router-dom";
+import {
+  PiPaypalLogoFill,
+  
+} from "react-icons/pi";
 
 const api_url = import.meta.env.VITE_APP_API_URL;
 
@@ -13,6 +17,10 @@ enum STEP {
   SIGNUP,
   BILLING
 }
+
+const PAYMENT_BADGES = [
+  PiPaypalLogoFill,
+];
 
 const Register = () => {
   const navigate = useNavigate();
@@ -412,6 +420,9 @@ const Register = () => {
         >
           <p>Subscribe</p>
         </button>
+      </div>
+      <div>
+        
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { FaFacebookF } from "react-icons/fa";
 import { PiInstagramLogoFill, PiTiktokLogoFill, PiXLogoFill, PiYoutubeLogoFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
-import { Pagination } from 'swiper/modules';
+import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import GradientStarIcon from "../../components/GradientStars";
@@ -140,37 +140,58 @@ export default function Welcome() {
           </div>
         </Box>
 
-        <div className={styles["get-started-section"]}>
-          <h1>Discover The  <span className="gradient-text">ULTIMATE </span>Streaming Service</h1>
+        {/* <div className={styles["get-started-section"]}>
           <br />
+        </div> */}
 
-          <button
-            className={"theme_button_danger"}
-            style={{
-              borderColor: '#14f59e',
-              background: '#14f59e1f',
-              color: '#14f59e',
-            }}
-            onClick={onSignUp}
-          >
-            Get Started
-          </button>
-        </div>
-
-        <div className={styles["middle-gradient-section"]}></div>
         <div className={styles["middle-text-section"]}>
-          <div className={styles["middle-text-innersection"]}>
-            <h1 className="font-semibold"> 
-              Unlimited <span className="gradient-text"> • </span> Ad-Free <span className="gradient-text"> • </span>  Award-Winning <span className="gradient-text"> • </span>  4K Movies & TV Shows <span className="gradient-text"> FOR ONLY 99₵/MONTH</span>
-              <br />
-              <br />
-              Join <span className="gradient-text"> 20M+ SATISFIED </span> Users
+          <section className="mb-4">
+            <div className={styles["middle-text-innersection"]}>
+              <Swiper
+                spaceBetween={30}
+                pagination={{
+                  clickable: true,
+                }}
+                autoplay={{
+                  delay: 2500,
+                  disableOnInteraction: false,
+                }}
+                modules={[Pagination, Autoplay]}
+                className="font-semibold"
+              >
+                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                  <h1>Discover The <span className="gradient-text">ULTIMATE </span>Streaming Service</h1>
+                </SwiperSlide>
+                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                  <h1>
+                    Unlimited <span className="gradient-text">•</span>
+                    {" "}Ad-Free <span className="gradient-text">•</span>
+                    {" "}Award-Winning <span className="gradient-text">•</span>
+                    {" "}4K Movies & TV Shows
+                    {" "}<span className="gradient-text">FOR ONLY 99₵/MONTH</span>
+                  </h1>
+                </SwiperSlide>
+                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                  <h1>Join <span className="gradient-text"> 20M+ SATISFIED </span> Users</h1>
+                </SwiperSlide>
+                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                  <h1>Enjoy <span className="gradient-text">1 MONTH FREE TRIAL</span></h1>
+                </SwiperSlide>
+              </Swiper>
+            </div>
 
-              <br />
-              <br />
-              Enjoy <span className="gradient-text">1 MONTH FREE TRIAL </span>
-            </h1>
-          </div>
+            <button
+              className={"theme_button_danger"}
+              style={{
+                borderColor: '#14f59e',
+                background: '#14f59e1f',
+                color: '#14f59e',
+              }}
+              onClick={onSignUp}
+            >
+              Get Started
+            </button>
+          </section>
 
           <center>
             <img src="/images/homeSS.png" style={{
@@ -208,6 +229,33 @@ export default function Welcome() {
                   </div>
                 </div>)}
               </div>
+            </div>
+          </div>
+
+          <center>
+            <h1 className="font-semibold gradient-text">AFFILIATION AND ACKNOWLEDGEMENTS</h1>
+          </center>
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-7">
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/DREAMWORKS STUDIOS.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/MARVEL STUDIOS.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/PARAMOUNT.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/SONY PICTURES.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/UNIVERSAL.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/WALT DISNEY PICTURES.png" width="200" />
+            </div>
+            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
+              <img src="/affiliate logos/WARNER BROS..png" width="200" />
             </div>
           </div>
 
