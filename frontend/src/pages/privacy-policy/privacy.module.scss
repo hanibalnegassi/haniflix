@@ -1,8 +1,6 @@
 .loginNew {
-
     background: url("/images/home0.jpeg") repeat center center;
     background-size: cover;
-
 
     @media (max-width: 768px) {
         background: url("/images/mbhome.jpg");
@@ -32,13 +30,7 @@
         position: absolute;
         z-index: 99;
         top: 0px;
-        left: 8px;
         margin-top: 40px;
-        margin-left: 32px;
-
-        @media (max-width: 768px) {
-            margin-left: 10px;
-        }
     }
 
     .section {
@@ -102,17 +94,10 @@
     }
 
     button {
-        height: 55px;
-        width: 100%;
-        margin-top: 68px;
-        margin: 5px auto 10px auto;
-        border-radius: 5px;
         background-color: transparent;
         border: 2px solid;
-        border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
         border-image-slice: 1;
         color: #ffffff;
-        // border: none;
         font-size: 18px;
         font-weight: 500;
         cursor: pointer;
@@ -128,7 +113,6 @@
 
     .link {
         color: #fff;
-        text-decoration: underline;
     }
 
     #scroll-simulator {

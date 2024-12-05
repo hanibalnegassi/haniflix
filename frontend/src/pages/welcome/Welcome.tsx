@@ -3,8 +3,9 @@ import { useCallback } from "react";
 import { FaFacebookF } from "react-icons/fa";
 import { PiInstagramLogoFill, PiTiktokLogoFill, PiXLogoFill, PiYoutubeLogoFill } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
-import { Pagination, Autoplay } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { styled } from '@mui/material/styles';
 
 import GradientStarIcon from "../../components/GradientStars";
 import ImageTicker from "../../components/TickerImages";
@@ -44,6 +45,18 @@ const images = [
   '/movies posters/The Fall Guy.png',
   '/movies posters/TWISTERS.png',
   '/movies posters/Venom The Last Dance.png',
+];
+
+const LOGOS = [
+  "/affiliate logos/DREAMWORKS STUDIOS.png",
+  "/affiliate logos/LIONSGATE.png",
+  "/affiliate logos/PARAMOUNT.png",
+  "/affiliate logos/SONY PICTURES.png",
+  "/affiliate logos/UNIVERSAL.png",
+  "/affiliate logos/WALT DISNEY PICTURES.png",
+  "/affiliate logos/WARNER BROS.png",
+  "/affiliate logos/20_century_studio.webp",
+  "/affiliate logos/amazon_mgm.webp"
 ];
 
 const accordionItems = [
@@ -105,10 +118,59 @@ const socialIcons = [
   { Icon: FaFacebookF, url: '#' }
 ];
 
+// LogoWrapper
+const GradientDiv = styled('div')(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 6,
+  background: 'linear-gradient(180deg, rgba(30, 34, 45, 0) 0%, #0f152b 100%)',
+}));
+
 export default function Welcome() {
   const navigate = useNavigate();
 
   const onSignUp = useCallback(() => navigate('/register'), []);
+
+  const getStartedBtn = (
+    <button
+      className="theme_button_danger mx-auto my-1 block"
+      style={{
+        borderColor: '#14f59e',
+        background: '#14f59e1f',
+        color: '#14f59e',
+      }}
+      onClick={onSignUp}
+    >
+      Get Started
+    </button>
+  );
+
+  const socialIconsDiv = (
+    <div className="flex items-center justify-between mx-auto gap-1 lg:gap-3 lg:-mt-2" style={{ maxWidth: 300 }}>
+      {socialIcons.map((item, index) => (
+        <Link key={index} to={item.url}>
+          <svg width="50" height="50" viewBox="0 0 24 24">
+            {/* Define the linear gradient */}
+            <defs>
+              <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="53.93%" stopColor="#14FA9B" />
+                <stop offset="77.59%" stopColor="#128EE9" />
+              </linearGradient>
+            </defs>
+
+            {/* Border circle */}
+            <circle cx="12" cy="12" r="11" fill="transparent" stroke='url(#starGradient)' strokeWidth="1" />
+
+            {/* Your SVG icon with gradient fill */}
+            <g transform="translate(7 7) scale(0.6)" >
+              <item.Icon style={{ fill: 'url(#starGradient)' }} className={styles["socialIcons"]} />
+            </g>
+          </svg>
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <div className={styles["welcomePage-outer"] + ' w-full'}>
@@ -117,13 +179,12 @@ export default function Welcome() {
           <div
             className={addClassNames(
               styles["wrapper"],
-              " flex pt-9  items-center justify-between "
+              "flex pt-9  items-center justify-between"
             )}
           >
-            <a href={"/"} className={styles["link"]}>
+            <Link to={"/"} className={styles["link"] + " no-underline"}>
               <h1> <span style={{ fontWeight: '700', fontSize: "20px" }} className="gradient-text">HANIFLIX</span></h1>
-
-            </a>
+            </Link>
             <div className="flex items-center space-x-[10px]">
               <button
                 className={"theme_button_danger"}
@@ -149,20 +210,18 @@ export default function Welcome() {
             <div className={styles["middle-text-innersection"]}>
               <Swiper
                 spaceBetween={30}
-                pagination={{
-                  clickable: true,
-                }}
                 autoplay={{
                   delay: 2500,
                   disableOnInteraction: false,
                 }}
-                modules={[Pagination, Autoplay]}
+                modules={[Autoplay]}
                 className="font-semibold"
               >
-                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                <SwiperSlide className="flex flex-col items-center justify-center">
                   <h1>Discover The <span className="gradient-text">ULTIMATE </span>Streaming Service</h1>
+                  {getStartedBtn}
                 </SwiperSlide>
-                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
+                <SwiperSlide className="flex flex-col items-center justify-center">
                   <h1>
                     Unlimited <span className="gradient-text">•</span>
                     {" "}Ad-Free <span className="gradient-text">•</span>
@@ -170,27 +229,18 @@ export default function Welcome() {
                     {" "}4K Movies & TV Shows
                     {" "}<span className="gradient-text">FOR ONLY 99₵/MONTH</span>
                   </h1>
+                  {getStartedBtn}
                 </SwiperSlide>
-                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
-                  <h1>Join <span className="gradient-text"> 20M+ SATISFIED </span> Users</h1>
+                <SwiperSlide className="flex flex-col items-center justify-center">
+                  <h1>Join <span className="gradient-text">20M+</span> Satisfied Users</h1>
+                  {getStartedBtn}
                 </SwiperSlide>
-                <SwiperSlide className="min-h-[calc(100vh_-_150px)] md:min-h-[600px] flex items-center justify-center">
-                  <h1>Enjoy <span className="gradient-text">1 MONTH FREE TRIAL</span></h1>
+                <SwiperSlide className="flex flex-col items-center justify-center">
+                  <h1>Enjoy 1 Month <span className="gradient-text">FREE</span> On Us</h1>
+                  {getStartedBtn}
                 </SwiperSlide>
               </Swiper>
             </div>
-
-            <button
-              className={"theme_button_danger"}
-              style={{
-                borderColor: '#14f59e',
-                background: '#14f59e1f',
-                color: '#14f59e',
-              }}
-              onClick={onSignUp}
-            >
-              Get Started
-            </button>
           </section>
 
           <center>
@@ -202,61 +252,65 @@ export default function Welcome() {
 
           <center>
             <h1 className="font-semibold">
-              <span className="gradient-text">See What 20M+ SATISFIED USERS Are Enjoying</span>
+              See What <span className="gradient-text">20M+</span> Satisfied Users Are Enjoying
             </h1>
           </center>
-          <div style={{
-            maxWidth: "1120px",
-            margin: 'auto',
-            padding: "40px 0px",
-            marginBottom: "60px"
-          }}>
-            <ImageTicker images={images} />
-          </div>
+          <ImageTicker images={images} />
 
-          <center>
-            <h1 className="font-semibold">See What  <span className="gradient-text">20M+ SATISFIED USERS </span>Are Saying</h1>
-          </center>
-
-          <div className="flex justify-center">
-            <div className="w-full lg px-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {reviews.map(x => <div className={styles["reviews-box"] + ` p-4`}>
-                  <p className="gradient-text2" style={{ fontSize: '24px' }}>{x.name}</p>
-                  <p>{x.description}</p>
-                  <div style={{ display: 'flex' }}>
-                    {Array.from({ length: x.stars }, () => 0).map(() => <GradientStarIcon />)}
-                  </div>
-                </div>)}
+          <section>
+            <center>
+              <h1 className="font-semibold">See What <span className="gradient-text">20M+</span> Satisfied Users Are Saying</h1>
+            </center>
+            {/* Not Mobile */}
+            <div className="justify-center hidden md:flex">
+              <div className="w-full lg px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {reviews.map((x, index) => (
+                    <div key={index} className={styles["reviews-box"] + ` p-4`}>
+                      <p className="gradient-text2" style={{ fontSize: '24px' }}>{x.name}</p>
+                      <p>{x.description}</p>
+                      <div style={{ display: 'flex' }}>
+                        {Array.from({ length: x.stars }, () => 0).map(() => <GradientStarIcon />)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Mobile */}
+            <div className="block md:hidden">
+              <Swiper
+                autoplay={{
+                  delay: 2500,
+                  disableOnInteraction: false,
+                }}
+                modules={[Autoplay]}
+              >
+                {reviews.map((x, index) => (
+                  <SwiperSlide key={index}>
+                    <div className={styles["reviews-box"] + ` p-4`}>
+                      <p className="gradient-text2" style={{ fontSize: '24px' }}>{x.name}</p>
+                      <p>{x.description}</p>
+                      <div style={{ display: 'flex' }}>
+                        {Array.from({ length: x.stars }, () => 0).map(() => <GradientStarIcon />)}
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </section>
 
           <center>
-            <h1 className="font-semibold gradient-text">AFFILIATION AND ACKNOWLEDGEMENTS</h1>
+            <h1 className="font-semibold">Our <span className="gradient-text">PARTNERS</span></h1>
           </center>
-          <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-7">
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/DREAMWORKS STUDIOS.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/MARVEL STUDIOS.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/PARAMOUNT.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/SONY PICTURES.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/UNIVERSAL.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/WALT DISNEY PICTURES.png" width="200" />
-            </div>
-            <div className="p-3 rounded-md bg-[#ffffffbf] flex items-center justify-center">
-              <img src="/affiliate logos/WARNER BROS..png" width="200" />
-            </div>
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-9">
+            {LOGOS.map((item: string) => (
+              <GradientDiv>
+                <img className="invert" src={item} width="200" />
+              </GradientDiv>
+            ))}
           </div>
 
           <center>
@@ -268,55 +322,41 @@ export default function Welcome() {
             <AppAccordion items={accordionItems} />
           </div>
 
+          <button
+            className="theme_button_danger block m-auto my-9"
+            style={{
+              borderColor: '#14f59e',
+              background: '#14f59e1f',
+              color: '#14f59e',
+            }}
+            onClick={onSignUp}
+          >
+            Get Started
+          </button>
+
           <center>
-            <h1 className="font-semibold">Join <span className="gradient-text">HANIFLIX </span>Today</h1>
-            <button
-              className={"theme_button_danger"}
-              style={{
-                borderColor: '#14f59e',
-                background: '#14f59e1f',
-                color: '#14f59e',
-                marginBottom: '35px'
-              }}
-              onClick={onSignUp}
-            >
-              Get Started
-            </button>
+            <h1 className="font-semibold"><span className="gradient-text">CONNECT</span> With Us</h1>
           </center>
-
-          <div className="flex items-center justify-between  max-w-250px mx-auto" style={{ maxWidth: 300 }}>
-            {socialIcons.map((item, index) => (
-              <Link key={index} to={item.url}>
-                <svg width="50" height="50" viewBox="0 0 24 24">
-                  {/* Define the linear gradient */}
-                  <defs>
-                    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="53.93%" stopColor="#14FA9B" />
-                      <stop offset="77.59%" stopColor="#128EE9" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Border circle */}
-                  <circle cx="12" cy="12" r="11" fill="transparent" stroke='url(#starGradient)' strokeWidth="1" />
-
-                  {/* Your SVG icon with gradient fill */}
-                  <g transform="translate(7 7) scale(0.6)" >
-                    <item.Icon style={{ fill: 'url(#starGradient)' }} className={styles["socialIcons"]} />
-                  </g>
-                </svg>
-              </Link>
-            ))}
-          </div>
-          <hr style={{ marginTop: "35px", marginBottom: "35px" }} />
           <div className={addClassNames(
-            styles["footer-hme"], "flex justify-between")}>
-            <div className="flex-none"> {/* Left column */}
+            styles["footer-hme"], "flex justify-between items-center gap-4")}
+          >
+            {/* Only Mobile */}
+            <div className="block md:hidden text-center">
+              {socialIconsDiv}
+            </div>
+            <div className="flex-none w-[285px] text-center">
               <p>© 2024 HANIFLIX . All rights reserved.</p>
             </div>
-            <div className="flex-none"> {/* Right column */}
-              <Link to='/privacy-policy'>Privacy Policy</Link>
+
+            {/* Not Mobile */}
+            <div className="hidden md:block">
+              {socialIconsDiv}
+            </div>
+
+            <div className="flex-none w-[285px] text-center">
+              <Link to='/privacy-policy'>Privacy policy</Link>
               &nbsp;&nbsp;&nbsp;
-              <Link to='/terms-service'>Terms & Service</Link>
+              <Link to='/terms-service'>Terms of service</Link>
             </div>
           </div>
         </div>
