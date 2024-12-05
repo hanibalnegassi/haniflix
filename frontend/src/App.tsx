@@ -21,10 +21,9 @@ import { selectUser } from "./store/reducers/auth";
 import Welcome from "./pages/welcome/Welcome";
 
 import AppRouter from "./router/AppRouter";
-
-import "./index.css";
 import { SocketProvider } from "./context/SocketContext";
 
+import "./index.css";
 import * as React from "react";
 
 const App = () => {
