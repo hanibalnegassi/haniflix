@@ -151,14 +151,6 @@ export default function Welcome() {
       {socialIcons.map((item, index) => (
         <Link key={index} to={item.url}>
           <svg width="50" height="50" viewBox="0 0 24 24">
-            {/* Define the linear gradient */}
-            <defs>
-              <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="53.93%" stopColor="#14FA9B" />
-                <stop offset="77.59%" stopColor="#128EE9" />
-              </linearGradient>
-            </defs>
-
             {/* Border circle */}
             <circle cx="12" cy="12" r="11" fill="transparent" stroke='url(#starGradient)' strokeWidth="1" />
 
@@ -174,6 +166,16 @@ export default function Welcome() {
 
   return (
     <div className={styles["welcomePage-outer"] + ' w-full'}>
+      {/* SVG Gradient Definition */}
+      <svg height="0">
+        <defs>
+          <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="53.93%" stopColor="#14FA9B" />
+            <stop offset="77.59%" stopColor="#128EE9" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className={styles["welcomePage"] + ' w-full h-full relative z-[1] overflow-y-scroll CustomScroller'}>
         <Box className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}>
           <div
@@ -200,10 +202,6 @@ export default function Welcome() {
             </div>
           </div>
         </Box>
-
-        {/* <div className={styles["get-started-section"]}>
-          <br />
-        </div> */}
 
         <div className={styles["middle-text-section"]}>
           <section className="mb-4">
@@ -262,15 +260,16 @@ export default function Welcome() {
               <h1 className="font-semibold">See What <span className="gradient-text">20M+</span> Satisfied Users Are Saying</h1>
             </center>
             {/* Not Mobile */}
-            <div className="justify-center hidden md:flex">
+            <div className="hidden md:flex justify-center">
               <div className="w-full lg px-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {reviews.map((x, index) => (
                     <div key={index} className={styles["reviews-box"] + ` p-4`}>
                       <p className="gradient-text2" style={{ fontSize: '24px' }}>{x.name}</p>
                       <p>{x.description}</p>
-                      <div style={{ display: 'flex' }}>
-                        {Array.from({ length: x.stars }, () => 0).map(() => <GradientStarIcon />)}
+                      <div className="flex">
+                        {Array.from({ length: x.stars }, () => 0)
+                          .map((_, index) => <GradientStarIcon key={index} />)}
                       </div>
                     </div>
                   ))}
