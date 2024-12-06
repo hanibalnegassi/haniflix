@@ -1,45 +1,87 @@
 
-import styles from "./privacy.module.scss";
-import { addClassNames } from "../../store/utils/functions";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
+
+import { addClassNames } from "../../store/utils/functions";
+
+import styles from "./privacy.module.scss";
 
 const PrivacyPage = () => {
-
-    return (
-        <>
-            <div className={addClassNames(styles["loginNew"])}>
-            <div className="absolute pointer-events-none top-0 right-0 left-0 h-[60px] bg-gradient-to-b from-black to-transparent"></div>
-
-                <Box
-                    className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
-
-                // style={{ maxWidth: 1200, marginLeft: "auto", marginRight: "auto" }}
-                >
-                    <div
-                        className={addClassNames(
-                            styles["wrapper"],
-                            " flex items-center justify-between "
-                        )}
-                    >
-                        <a href={"/"} style={{ textDecoration: "none" }} className={styles["link"]}>
-                            <h1> <span style={{ fontWeight: '700', fontSize: "20px" }} className="gradient-text">HANIFLIX</span></h1>
-
-                        </a>
-
-                    </div>
-                </Box>
-                <div className="container overflow-auto	p-2 mt-2">
-                    <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text" >
-                        Privacy Policy
-                    </h2>
-                    <p className="text-lg">
-                        This privacy policy ("policy") will help you understand how Haniflix ("us", "we", "our") uses and protects the data you provide to us when you visit and use www.haniflix.com ("website ", "service"). We reserve the right to change this policy at any given time, of which you will be promptly updated. If you want to make sure that you are up to date with the latest changes, we advise you to frequently visit this page. What User Data We Collect When you visit the website, we may collect the following data: • Your IP address. • Your contact information and email address. • Other information such as interests and preferences. • Data profile regarding your online behavior on our website. Why We Collect Your Data We are collecting your data for several reasons: • To better understand your needs. • To improve our services and products. • To send you promotional emails containing the information we think you will find interesting. • To contact you to fill out surveys and participate in other types of market research. • To customize our website according to your online behavior and personal preferences. Safeguarding and Securing the Data Haniflix is committed to securing your data and keeping it confidential. Haniflix has done all in its power to prevent data theft, unauthorized access, and disclosure by implementing the latest technologies and software, which help us safeguard all the information we collect online. Our Cookie Policy Once you agree to allow our website to use cookies, you also agree to use the data it collects regarding your online behavior (analyze web traffic, web pages you visit and spend the most time on). The data we collect by using cookies is used to customize our website to your needs. Website privacy policy template by WebsitePolicies.com After we use the data for statistical analysis, the data is completely removed from our systems. Please note that cookies don't allow us to gain control of your computer in any way. They are strictly used to monitor which pages you find useful and which you do not so that we can provide a better experience for you. If you want to disable cookies, you can do it by accessing the settings of your internet browser. You can visit https://www.internetcookies.com, which contains comprehensive information on how to do this on a wide variety of browsers and devices. Links to Other Websites Our website contains links that lead to other websites. If you click on these links Haniflix is not held responsible for your data and privacy protection. Visiting those websites is not governed by this privacy policy agreement. Make sure to read the privacy policy documentation of the website you go to from our website. Restricting the Collection of your Personal Data At some point, you might wish to restrict the use and collection of your personal data. You can achieve this by doing the following: When you are filling the forms on the website, make sure to check if there is a box which you can leave unchecked, if you don't want to disclose your personal information. If you have already agreed to share your information with us, feel free to contact us via email and we will be more than happy to change this for you. Haniflix will not lease, sell or distribute your personal information to any third parties, unless we have your permission. We might do so if the law forces us. Your personal information will be used when we need to send you promotional materials if you agree to this privacy policy.
-
-                    </p>
-                </div>
-            </div>
-        </>
-    );
+  const navigate = useNavigate();
+  return (
+    <>
+      <div className={addClassNames(styles["loginNew"])}>
+        <Box className={addClassNames(styles["top"], "px-[20px] w-full")}>
+          <div className={addClassNames(styles["wrapper"], "flex items-center justify-between w-full")}>
+            <Link to={"/"} className={styles["link"] + " no-underline"}>
+              <h1><span style={{ fontWeight: '700', fontSize: "20px" }} className="gradient-text">HANIFLIX</span></h1>
+            </Link>
+            <button className="theme_button_danger w-[120px] rounded-[10px]"
+              style={{
+                borderColor: '#14f59e',
+                background: '#14f59e1f',
+                color: '#14f59e',
+              }}
+              onClick={() => navigate("/login")}
+            >
+              Sign In
+            </button>
+          </div>
+        </Box>
+        <div className="container overflow-auto	p-2 mt-2">
+          <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text" >
+            Privacy Policy
+          </h2>
+          <p className="text-lg">
+            Introduction
+            <br /><br />
+            At Haniflix, we value your privacy and are committed to protecting your personal data. This Privacy Policy outlines how we collect, use, and safeguard your information when you use our services.
+            <br /><br />
+            Information We Collect
+            <br /><br />
+            Personal Information: When you sign up for Haniflix, we collect your name, email address, payment information, and other necessary details to provide our services.
+            <br /><br />
+            Usage Data: We collect information about how you interact with our platform, such as the movies you watch, your browsing habits, and your device information.
+            <br /><br />
+            How We Use Your Information
+            <br /><br />
+            Service Delivery: To provide and maintain our streaming services, including user account management, customer support, and processing payments.
+            <br /><br />
+            Personalization: To tailor our content recommendations based on your preferences and usage patterns.
+            <br /><br />
+            Improvement: To analyze user behavior and improve our services, features, and content offerings.
+            <br /><br />
+            Sharing Your Information
+            <br /><br />
+            Third-Party Services: We may share your information with third-party service providers to assist with payment processing, content delivery, and analytics.
+            <br /><br />
+            Legal Requirements: We may disclose your information if required by law or to protect our rights and users' safety.
+            <br /><br />
+            Data Security
+            <br /><br />
+            We implement robust security measures to protect your data from unauthorized access, alteration, or destruction. However, no internet transmission is entirely secure, and we cannot guarantee absolute security.
+            <br /><br />
+            Your Rights
+            <br /><br />
+            Access: You have the right to access the personal data we hold about you.
+            <br /><br />
+            Correction: You can request corrections to any inaccurate or incomplete data.
+            <br /><br />
+            Deletion: You may request the deletion of your personal data, subject to certain conditions.
+            <br /><br />
+            Changes to This Policy
+            <br /><br />
+            We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on our website.
+            <br /><br />
+            Contact Us
+            <br /><br />
+            If you have any questions or concerns about our Privacy Policy, please contact us at haniflix@icloud.com.
+          </p>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default PrivacyPage;

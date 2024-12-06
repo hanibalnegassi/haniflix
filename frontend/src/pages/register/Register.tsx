@@ -343,7 +343,7 @@ const Register = () => {
   );
 
   const billing = (
-    <>
+    <div className="max-w-[400px]">
       <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
         Billing
       </h2>
@@ -413,7 +413,11 @@ const Register = () => {
           <p>Subscribe</p>
         </button>
       </div>
-    </>
+      <div className="text-white w-full">
+        You will not be charged for 30 days. Cancel anytime without any hidden fees.
+        <img className="m-auto mt-2 w-full" src="/images/AMEX EXPRESS.png" width="200" />
+      </div>
+    </div>
   );
 
   return (
