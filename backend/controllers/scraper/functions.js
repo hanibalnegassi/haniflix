@@ -283,6 +283,75 @@ async function searchAndScrapeMovies(
   }
 }
 
+async function scrapeSingleMovieDetails({ _page, url }) {
+  let browserInitializedLocally = false;
+
+  if (!browser) {
+    await initBrowser();
+    browserInitializedLocally = true;
+  }
+
+  let page;
+
+  try {
+    if (!_page) {
+      page = await browser.newPage();
+      await page.setExtraHTTPHeaders({
+        "Accept-Language": "en-US,en;q=0.9",
+      });
+      await page.setUserAgent("Mozilla/5.0 ... Chrome/66.0.3359.181 Safari/537.36");
+      await page.setViewport({ width: 1366, height: 768 });
+      await page.goto(url, {
+        waitUntil: ["domcontentloaded", "networkidle2", "load"],
+      });
+    } else if (_page instanceof puppeteer.Page) {
+      page = _page;
+    }
+
+    const movieDetails = await page.$eval("body", (body) => {
+      const title = body.querySelector('main h1[kind="h1"]')?.textContent.trim();
+      const duration = body.querySelector('main div span[duration]')?.textContent.trim();
+      const genreText = body.querySelector('main div a[href*="/movies/genre"] p')?.textContent.trim();
+      const fullDescription = body.querySelector('main div[data-testid="read-more-text-container"] p')?.textContent.trim();
+      const ageRating = body.querySelector('main div a[href*="/movies/genre"] + div + p + div + p')?.textContent.trim();
+      const yearOfReleaseParent = body.querySelector('main div a[href*="/movies/genre"]')?.parentElement;
+      let yearOfRelease = '';
+      if(!yearOfReleaseParent) {
+        yearOfRelease = body.querySelector('main a[href*="/year"]')?.textContent.trim();
+      } else {
+        yearOfRelease = yearOfReleaseParent.children[0]?.textContent.trim();
+      }
+      const imageUrl = body.querySelector('main picture img[alt*="Poster"]')?.src || "";
+      const largestImageUrl = body.querySelector('main picture img[alt*="Backdrop"]')?.src || "";
+      const genre = genreText ? genreText.split(' / ').map(g => g.trim()) : [];
+      const trailerUrl = body.querySelector('iframe')?.href
+      return {
+        title,
+        description: fullDescription,
+        imageUrl,
+        largestImageUrl,
+        ageRating,
+        genre,
+        yearOfRelease,
+        duration,
+        trailerUrl
+      };
+    });
+
+    return movieDetails;
+  } catch (error) {
+    Logger.error(`Error scraping movie details: ${error.message}`);
+    return {};
+  } finally {
+    if (!_page) {
+      await page.close();
+    }
+    if (browserInitializedLocally) {
+      await closeBrowser();
+    }
+  }
+}
+
 async function searchAndScrapeMovie(page, movieName, movieYear) {
     try {
       // Clear any pre-filled text in the search input
@@ -302,7 +371,7 @@ async function searchAndScrapeMovie(page, movieName, movieYear) {
       await page.waitForSelector('ul > li.ac-item-hover', { timeout: 60 * 1000 });
   
       // Extract the dropdown results
-      const resultLinks = await page.$$eval('ul > li.ac-item-hover a', (links) =>
+      const resultLinks = await page.$$eval('.ac-results ul > li a', (links) =>
         links.map((link) => ({
           title: link.querySelector('span').textContent,
           href: link.getAttribute("href"),
@@ -322,7 +391,7 @@ async function searchAndScrapeMovie(page, movieName, movieYear) {
         const sanitizedMovieName = movieName.replace(/[^\w\s]/gi, "").toLowerCase();
         const allWordsIncluded = sanitizedMovieName.split(" ").every((word) => sanitizedTitle.includes(word));
         const matchesYear = link.year.includes(movieYear);
-  
+
         return allWordsIncluded && matchesYear;
       });
   
@@ -354,4 +423,5 @@ async function searchAndScrapeMovie(page, movieName, movieYear) {
 module.exports = {
   scrapeMovieDetails,
   searchAndScrapeMovies,
+  scrapeSingleMovieDetails
 };
