@@ -127,7 +127,7 @@ const Register = () => {
 
   const validateNameOnCard = (nameOnCard: string) => {
     if (!nameOnCard) {
-      setNameOnCard('Name On Card is required');
+      setNameOnCardError('Name On Card is required');
     } else {
       setNameOnCardError('');
     }
@@ -234,6 +234,18 @@ const Register = () => {
     setStep(STEP.BILLING);
   };
 
+  const handleBillingKeyDown = (event) => {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      handleBilling();
+    }
+  };
+
+  const handleSignUpKeyDown = (event) => {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      handleSignUp();
+    }
+  };
+
   const handleBilling = () => {
     if (!cardNumber || !expiryDate || !cvc || !nameOnCard) {
       validateCardNumber(cardNumber);
@@ -299,6 +311,7 @@ const Register = () => {
               name='username'
               onChange={handleUsernameChange}
               value={username}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{usernameError}</small>
@@ -312,6 +325,7 @@ const Register = () => {
               name='email'
               onChange={handleEmailChange}
               value={email}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{emailError}</small>
@@ -325,6 +339,7 @@ const Register = () => {
               name='password'
               onChange={handlePasswordChange}
               value={password}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{passwordError}</small>
@@ -338,13 +353,14 @@ const Register = () => {
               name='repeat-password'
               onChange={handleRepeatPassword}
               value={repeatPassword}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{repeatPasswordError}</small>
         </div>
         <div className='flex items-center justify-center'>
           <button
-            type='submit'
+            type="button"
             className={styles['btn']}
             style={{
               borderColor: '#14f59e',
@@ -352,8 +368,14 @@ const Register = () => {
               color: '#14f59e',
             }}
             onClick={handleSignUp}
-            disabled={!isFormValid}>
-            <p>Continue</p>
+            disabled={!isFormValid}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleSignUp();
+              }
+            }}
+            >
+            Continue
           </button>
         </div>
         <div className='text-white text-md text-center'>
@@ -383,6 +405,7 @@ const Register = () => {
             name='cardNumber'
             value={cardNumber}
             onChange={handleCardNumberChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{cardNumberError}</small>
@@ -396,6 +419,7 @@ const Register = () => {
             name='expiryDate'
             value={expiryDate}
             onChange={handleExpiryDateChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{expiryDateError}</small>
@@ -409,6 +433,7 @@ const Register = () => {
             name='cvc'
             value={cvc}
             onChange={handleCvcChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{cvcError}</small>
@@ -422,6 +447,7 @@ const Register = () => {
             name='nameOnCard'
             value={nameOnCard}
             onChange={handleNameOnCardChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{nameOnCardError}</small>
@@ -435,6 +461,7 @@ const Register = () => {
             name='billingAddress'
             value={billingAddress}
             onChange={handleBillingAddressChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{billingAddressError}</small>
