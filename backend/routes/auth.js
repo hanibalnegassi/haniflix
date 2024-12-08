@@ -1,18 +1,17 @@
-const sendMail = require("./mail/ForgotPassMail");
-const router = require("express").Router();
-const User = require("../models/User");
-const CryptoJS = require("crypto-js");
-const jwt = require("jsonwebtoken");
-const sgMail = require("@sendgrid/mail");
-const dotenv = require("dotenv");
+const sendMail = require('./mail/ForgotPassMail');
+const router = require('express').Router();
+const User = require('../models/User');
+const CryptoJS = require('crypto-js');
+const jwt = require('jsonwebtoken');
+const sgMail = require('@sendgrid/mail');
+const dotenv = require('dotenv');
 
-const email_from = "Haniflix <no-reply@haniflix.com>";
-const { List } = require("../models/index");
-
+const email_from = 'Haniflix <no-reply@haniflix.com>';
+const { List } = require('../models/index');
 
 dotenv.config();
 
-let paypalApiBaseUrl =process.env.PAYPAL_BASE_URL;
+let paypalApiBaseUrl = process.env.PAYPAL_BASE_URL;
 const planId = process.env.PAYPAL_PLAN_ID;
 const paypalClientId = process.env.PAYPAL_CLIENT_ID;
 const paypalSecret = process.env.PAYPAL_SECRET;
@@ -22,69 +21,81 @@ const appUrl = process.env.APP_URL; // "http://localhost:3000/";
 
 const getPayPalAccessToken = async () => {
   try {
-
-    const base64String = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString("base64")
+    const base64String = Buffer.from(
+      `${paypalClientId}:${paypalSecret}`
+    ).toString('base64');
     const response = await fetch(`${paypalApiBaseUrl}/v1/oauth2/token`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Basic ${base64String}`,
       },
-      body: "grant_type=client_credentials",
+      body: 'grant_type=client_credentials',
     });
     if (!response.ok) {
-      throw new Error(`Failed to fetch PayPal access token: ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch PayPal access token: ${response.statusText}`
+      );
     }
     const data = await response.json();
 
     return data.access_token;
   } catch (error) {
-    console.error("Error fetching PayPal access token:", error);
-    throw new Error("Failed to fetch PayPal access token");
+    console.error('Error fetching PayPal access token:', error);
+    throw new Error('Failed to fetch PayPal access token');
   }
 };
 
-const createPayPalSubscription = async (accessToken, planId, email, username) => {
+const createPayPalSubscription = async (
+  accessToken,
+  planId,
+  email,
+  username
+) => {
   try {
-    const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'PayPal-Request-Id': `SUBSCRIPTION-${new Date().toISOString().replace(/[^0-9]/g, '')}`,
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify({
-        "plan_id": planId,
-        "subscriber": {
-          "email_address": email,
-          "name": {
-            "given_name": username, // Assuming username should be included in the name field
-          }
-          // Optionally, include shipping_address if needed
+    const response = await fetch(
+      `${paypalApiBaseUrl}/v1/billing/subscriptions`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'PayPal-Request-Id': `SUBSCRIPTION-${new Date()
+            .toISOString()
+            .replace(/[^0-9]/g, '')}`,
+          Prefer: 'return=representation',
         },
-        "application_context": {
-          "brand_name": "Haniflix",
-          "locale": "en-US",
-          "user_action": "SUBSCRIBE_NOW",
-          "return_url": `${appUrl}thank-you/?success=true`,
-          "cancel_url": `${appUrl}register/cancelled=true`,
-        }
-      })
-    });
+        body: JSON.stringify({
+          plan_id: planId,
+          subscriber: {
+            email_address: email,
+            name: {
+              given_name: username, // Assuming username should be included in the name field
+            },
+            // Optionally, include shipping_address if needed
+          },
+          application_context: {
+            brand_name: 'Haniflix',
+            locale: 'en-US',
+            user_action: 'SUBSCRIBE_NOW',
+            return_url: `${appUrl}thank-you/?success=true`,
+            cancel_url: `${appUrl}register/cancelled=true`,
+          },
+        }),
+      }
+    );
 
     const subscription = await response.json();
 
-
     return subscription;
   } catch (error) {
-    console.error("Error creating PayPal subscription:", error);
-    throw new Error("Failed to create PayPal subscription");
+    console.error('Error creating PayPal subscription:', error);
+    throw new Error('Failed to create PayPal subscription');
   }
 };
 
-router.post("/v1/create-subscription-checkout-session", async (req, res) => {
+router.post('/v1/create-subscription-checkout-session', async (req, res) => {
   const { email, username } = req.body;
 
   try {
@@ -93,7 +104,7 @@ router.post("/v1/create-subscription-checkout-session", async (req, res) => {
     if (emailExists) {
       return res.status(404).json({
         error: true,
-        statusText: "This email already exists. Try another email",
+        statusText: 'This email already exists. Try another email',
       });
     }
 
@@ -102,19 +113,19 @@ router.post("/v1/create-subscription-checkout-session", async (req, res) => {
     if (usernameExists) {
       return res.status(404).json({
         error: true,
-        statusText: "This username already exists. Try another username",
+        statusText: 'This username already exists. Try another username',
       });
     }
 
     // If both email and username are unique
     return res.status(200).json({
       success: true,
-      statusText: "Both email and username are available",
+      statusText: 'Both email and username are available',
     });
   } catch (error) {
     res.status(500).json({
       error: true,
-      statusText: "An error occurred while checking the user information",
+      statusText: 'An error occurred while checking the user information',
     });
   }
 });
@@ -130,59 +141,64 @@ router.post("/v1/create-subscription-checkout-session", async (req, res) => {
 // } catch (error) {
 //   res.send(error);
 // }
-router.post("/v1/payment-success", async (req, res) => {
+router.post('/v1/payment-success', async (req, res) => {
   const { subscriptionId, email, password, username } = req.body;
 
   try {
     // Retrieve PayPal subscription details
-    console.log("before access token")
+    console.log('before access token');
     const accessToken = await getPayPalAccessToken();
 
-    console.log("got access token", accessToken)
+    console.log('got access token', accessToken);
     // Fetch subscription details from PayPal API
-    const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${subscriptionId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/json',
+    const response = await fetch(
+      `${paypalApiBaseUrl}/v1/billing/subscriptions/${subscriptionId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          Accept: 'application/json',
+        },
       }
-    });
+    );
 
-    console.log("response here", response)
+    console.log('response here', response);
     // Handle HTTP errors
     if (!response.ok) {
-      throw new Error(`Failed to retrieve PayPal subscription: ${response.status} - ${response.statusText}`);
+      throw new Error(
+        `Failed to retrieve PayPal subscription: ${response.status} - ${response.statusText}`
+      );
     }
 
     // Parse JSON response data
     const subscription = await response.json();
 
-    console.log("subscription", subscription)
-
+    console.log('subscription', subscription);
 
     // Check if user already exists
     const userExist = await User.findOne({ email: email });
 
     if (userExist && userExist.isSubscribed) {
-
-      return res.json({ message: "User is already subscribed" });
+      return res.json({ message: 'User is already subscribed' });
     }
 
     // Update existing user's subscription status if not subscribed
     if (userExist && !userExist.isSubscribed) {
-
-      await User.findOneAndUpdate(
-          { email: email },
-          { isSubscribed: true }
-      );
-      return res.json({ message: "User has been resubscribed" });
+      await User.findOneAndUpdate({ email: email }, { isSubscribed: true });
+      return res.json({ message: 'User has been resubscribed' });
     }
 
     // Create a new user if not exists and payment is successful
-    if (subscription.status === "APPROVAL_PENDING" || subscription.status === "ACTIVE") {
+    if (
+      subscription.status === 'APPROVAL_PENDING' ||
+      subscription.status === 'ACTIVE'
+    ) {
       // Encrypt password and generate OTP
-      const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY).toString();
+      const encryptedPassword = CryptoJS.AES.encrypt(
+        password,
+        process.env.SECRET_KEY
+      ).toString();
       const otp = CryptoJS.lib.WordArray.random(16);
 
       // Create new user in the database
@@ -194,8 +210,6 @@ router.post("/v1/payment-success", async (req, res) => {
         isSubscribed: true,
         subscriptionId: subscription.id,
       }).save();
-
-
 
       // Create default list for the user
       const defaultList = new List({
@@ -209,24 +223,25 @@ router.post("/v1/payment-success", async (req, res) => {
       newUser.defaultList = defaultList._id;
       await newUser.save();
 
-      return res.status(200).json({ message: "Payment successful", user: newUser });
+      return res
+        .status(200)
+        .json({ message: 'Payment successful', user: newUser });
     } else {
-      return res.json({ message: "Payment failed" });
+      return res.json({ message: 'Payment failed' });
     }
   } catch (error) {
-    console.error(error)
-    console.error("Error retrieving subscription:", error);
+    console.error(error);
+    console.error('Error retrieving subscription:', error);
     res.status(500).send(error.message);
   }
 });
 
-
-router.get("/send-email", async (req, res) => {
+router.get('/send-email', async (req, res) => {
   const msg = {
-    to: "aaron@professorval.com",
+    to: 'aaron@professorval.com',
     from: email_from,
-    subject: "Email Server Test",
-    html: "Email works!",
+    subject: 'Email Server Test',
+    html: 'Email works!',
   };
 
   // sgMail
@@ -239,7 +254,7 @@ router.get("/send-email", async (req, res) => {
   //   });
 });
 
-router.post("/register", async (req, res) => {
+router.post('/register', async (req, res) => {
   let {
     email,
     password,
@@ -247,7 +262,8 @@ router.post("/register", async (req, res) => {
     cardNumber,
     expiryDate,
     cvc,
-    billingAddress
+    billingAddress,
+    nameOnCard,
   } = req.body;
   username = username.toLowerCase();
 
@@ -259,7 +275,8 @@ router.post("/register", async (req, res) => {
       cardNumber,
       expiryDate,
       cvc,
-      billingAddress
+      billingAddress,
+      nameOnCard
     );
 
     if (newUser) {
@@ -281,19 +298,18 @@ router.post("/register", async (req, res) => {
       //   });
       // }
       res.status(200).json({
-        success: true
+        success: true,
       });
     } else {
-
       res.status(404).json({
         error: true,
         statusText:
-          "This username or email already exists. Try another username or Signin",
+          'This username or email already exists. Try another username or Signin',
       });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: true, statusText: "Something went wrong!" });
+    res.status(500).json({ error: true, statusText: 'Something went wrong!' });
   }
 });
 
@@ -346,23 +362,23 @@ router.post("/register", async (req, res) => {
 // Add a new function to delete the user and the list
 async function deleteUserAndList(user, list) {
   try {
-    console.log("Delete User", user, list);
+    console.log('Delete User', user, list);
     // Delete the user
     await User.findByIdAndDelete(user._id);
 
     // Delete the list
     await List.findByIdAndDelete(list._id);
 
-    console.log("User and list deleted successfully");
+    console.log('User and list deleted successfully');
   } catch (error) {
-    console.error("Error deleting user and list:", error);
-    throw new Error("Failed to delete user and list");
+    console.error('Error deleting user and list:', error);
+    throw new Error('Failed to delete user and list');
   }
 }
 
 async function subscribeUser(newUser, payment_method) {
-  console.log("newUser", newUser);
-  console.log("payment_method", payment_method);
+  console.log('newUser', newUser);
+  console.log('payment_method', payment_method);
   try {
     // Create a customer in Stripe
     const customer = await stripeInstance.customers.create({
@@ -372,7 +388,7 @@ async function subscribeUser(newUser, payment_method) {
       //   default_payment_method: payment_method,
       // },
     });
-    console.log("Stripe Customer created:", customer);
+    console.log('Stripe Customer created:', customer);
 
     // Add the payment method to the customer
     const attacher = await stripeInstance.paymentMethods.attach(
@@ -390,26 +406,26 @@ async function subscribeUser(newUser, payment_method) {
       }
     );
 
-    console.log("attached customer id", attacher);
-    console.log("update customer id", updatePaymentMethod);
+    console.log('attached customer id', attacher);
+    console.log('update customer id', updatePaymentMethod);
 
     // Create a subscription ---- BUGGY CODE
     const subscription = await stripeInstance.subscriptions.create({
       customer: customer.id,
       items: [{ price: process.env.STRIPE_SUBSCRIPTION_PRICE_ID.toString() }],
-      expand: ["latest_invoice.payment_intent"],
-      payment_behavior: "default_incomplete",
+      expand: ['latest_invoice.payment_intent'],
+      payment_behavior: 'default_incomplete',
       payment_settings: {
         payment_method_options: {
           card: {
-            request_three_d_secure: "automatic",
+            request_three_d_secure: 'automatic',
           },
         },
-        payment_method_types: ["card"],
-        save_default_payment_method: "on_subscription",
+        payment_method_types: ['card'],
+        save_default_payment_method: 'on_subscription',
       },
     });
-    console.log("subscription", subscription);
+    console.log('subscription', subscription);
 
     // // BUGGUY CODE HOW DO I FIX
 
@@ -428,29 +444,38 @@ async function subscribeUser(newUser, payment_method) {
 
     // return { subscription, user: newUser };
   } catch (error) {
-    console.error("Stripe Subscription Error:", error);
-    throw new Error("Subscription failed");
+    console.error('Stripe Subscription Error:', error);
+    throw new Error('Subscription failed');
   }
 }
 
-async function registerUser(email, password, username, cardNumber, expiryDate, cvc, billingAddress) {
+async function registerUser(
+  email,
+  password,
+  username,
+  cardNumber,
+  expiryDate,
+  cvc,
+  billingAddress,
+  nameOnCard
+) {
   try {
     // Check if a user with the provided email or username already exists
     const existingEmailUser = await User.findOne({ old: email });
     const existingUsernameUser = await User.findOne({ old: username });
     console.log(
-      "existingEmailUser under resgiter fundction",
+      'existingEmailUser under resgiter fundction',
       existingEmailUser
     );
     console.log(
-      "existingEmailUser under resgiter fundction",
+      'existingEmailUser under resgiter fundction',
       existingUsernameUser
     );
     // If a user with the email or username already exists, return an error
     if (existingEmailUser || existingUsernameUser) {
-      let errorMessage = "";
-      if (existingEmailUser) errorMessage += "This email already exists. ";
-      if (existingUsernameUser) errorMessage += "This username already exists.";
+      let errorMessage = '';
+      if (existingEmailUser) errorMessage += 'This email already exists. ';
+      if (existingUsernameUser) errorMessage += 'This username already exists.';
       console.log(errorMessage);
       return { error: { message: errorMessage }, newUser: null };
       // throw new Error(errorMessage);
@@ -466,18 +491,22 @@ async function registerUser(email, password, username, cardNumber, expiryDate, c
         process.env.SECRET_KEY
       ).toString(),
       billing: {
-        cardNumber, expiryDate, cvc, billingAddress
-      }
+        cardNumber,
+        expiryDate,
+        cvc,
+        billingAddress,
+        nameOnCard
+      },
     });
 
-    console.log("Newuser", newUser);
+    console.log('Newuser', newUser);
 
     const defaultList = new List({
       title: `${username}'s Watchlist`,
       user: newUser._id,
     });
 
-    console.log("defaultList", defaultList);
+    console.log('defaultList', defaultList);
 
     newUser.lists.push(defaultList._id);
     newUser.defaultList = defaultList._id;
@@ -513,7 +542,7 @@ async function registerUser(email, password, username, cardNumber, expiryDate, c
 // }
 
 //LOGIN
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     console.log('[login]', req.body);
 
@@ -523,26 +552,24 @@ router.post("/login", async (req, res) => {
     });
 
     if (!user) {
-      res.status(400).json({ message: "Wrong email provided!" });
+      res.status(400).json({ message: 'Wrong email provided!' });
       return;
     }
 
     if (user.emailVerified === false) {
       res.status(400).json({
-        message: "Your email address is not verified! Check your inbox.",
+        message: 'Your email address is not verified! Check your inbox.',
       });
       return;
     }
 
-
     const bytes = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
     const originalPassword = bytes.toString(CryptoJS.enc.Utf8);
 
-
-    console.log("originalPassword", originalPassword)
+    console.log('originalPassword', originalPassword);
     if (originalPassword !== req.body.password) {
       res.status(400).json({
-        message: "Wrong password or username!",
+        message: 'Wrong password or username!',
       });
       return;
     }
@@ -550,7 +577,6 @@ router.post("/login", async (req, res) => {
     // if (user.isAdmin === false) {
 
     //   const accessTokenPP = await getPayPalAccessToken();
-
 
     //   console.log("accessTokenPP",accessTokenPP)
     //   const response = await fetch(`${paypalApiBaseUrl}/v1/billing/subscriptions/${user.subscriptionId}`, {
@@ -586,12 +612,12 @@ router.post("/login", async (req, res) => {
     const accessToken = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.SECRET_KEY,
-      { expiresIn: "24h" }
+      { expiresIn: '24h' }
     );
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "30d" } // Adjust refresh token expiration time
+      { expiresIn: '30d' } // Adjust refresh token expiration time
     );
 
     user.accessToken = accessToken;
@@ -601,7 +627,6 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({ ...info, accessToken, refreshToken });
   } catch (err) {
-
     res.status(400).json({
       message: err?.message ? err?.message : err,
     });
@@ -609,12 +634,12 @@ router.post("/login", async (req, res) => {
 });
 
 //refresh token
-router.post("/refreshToken", async (req, res) => {
+router.post('/refreshToken', async (req, res) => {
   try {
     // 1. Verify refresh token
     const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-      return res.status(400).json({ error: "Refresh token is required" });
+      return res.status(400).json({ error: 'Refresh token is required' });
     }
 
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -624,14 +649,14 @@ router.post("/refreshToken", async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+      return res.status(401).json({ error: 'Invalid refresh token' });
     }
 
     // 3. Generate new access token
     const accessToken = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.SECRET_KEY,
-      { expiresIn: "24h" } // Adjust expiration time as needed
+      { expiresIn: '24h' } // Adjust expiration time as needed
     );
 
     // 4. Update accessToken in user document
@@ -642,21 +667,21 @@ router.post("/refreshToken", async (req, res) => {
     res.json({ accessToken });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-router.post("/verify_email", async (req, res) => {
+router.post('/verify_email', async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      res.status(200).json("Wrong email provided!");
+      res.status(200).json('Wrong email provided!');
       return;
     }
 
     if (user.emailVerified === true) {
-      res.status(200).json("Your email address is already verified!");
+      res.status(200).json('Your email address is already verified!');
       return;
     }
 
@@ -671,7 +696,7 @@ router.post("/verify_email", async (req, res) => {
             const accessToken = jwt.sign(
               { id: user._id, isAdmin: user.isAdmin },
               process.env.SECRET_KEY,
-              { expiresIn: "5d" }
+              { expiresIn: '5d' }
             );
 
             const { password, ...info } = docs._doc;
@@ -680,19 +705,19 @@ router.post("/verify_email", async (req, res) => {
         }
       );
     } else {
-      res.status(201).json("Wrong OTP supplied!");
+      res.status(201).json('Wrong OTP supplied!');
     }
   } catch (err) {
     res.status(201).json(err);
   }
 });
 
-router.post("/forgot-pass", async (req, res) => {
+router.post('/forgot-pass', async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user?.username) {
-      res.status(400).json({ error: true, statusText: "User does not exist!" });
+      res.status(400).json({ error: true, statusText: 'User does not exist!' });
       return;
     }
     const url = `${demo_url}change-password/${user._id}/${user.email}`;
@@ -700,7 +725,7 @@ router.post("/forgot-pass", async (req, res) => {
     const msg = {
       to: req.body.email,
       from: email_from,
-      subject: "Password Reset Link - Haniflix",
+      subject: 'Password Reset Link - Haniflix',
       html: `
           <p><strong>Hello Haniflix User,</strong></p>
           <p>We received a request to reset your password. Click on the link below to reset your password:</p>
@@ -728,20 +753,20 @@ router.post("/forgot-pass", async (req, res) => {
     //     res.status(203).json(error);
     //   });
   } catch (e) {
-    console.log("e ", e);
+    console.log('e ', e);
     res.status(400).json({
-      message: "Error encountered",
+      message: 'Error encountered',
       error: e,
     });
   }
 });
 
-router.put("/change-password", async (req, res) => {
+router.put('/change-password', async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(404).json("Wrong email provided!");
+      return res.status(404).json('Wrong email provided!');
     }
 
     // Hash the new password before updating
@@ -764,7 +789,7 @@ router.put("/change-password", async (req, res) => {
     res.status(200).json({ ...info });
   } catch (err) {
     console.error(err);
-    res.status(500).json("Internal Server Error");
+    res.status(500).json('Internal Server Error');
   }
 });
 

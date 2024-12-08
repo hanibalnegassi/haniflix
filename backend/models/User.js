@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
   {
@@ -10,15 +10,15 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     old_email: { type: String },
     password: { type: String, required: true },
-    profilePic: { type: String, defaut: "" },
-    subscriptionId: { type: String, defaut: "" },
+    profilePic: { type: String, defaut: '' },
+    subscriptionId: { type: String, defaut: '' },
     isAdmin: { type: Boolean, default: false },
     isSubscribed: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: true },
-    otp: { type: String, default: "" },
-    lists: [{ type: mongoose.Schema.Types.ObjectId, ref: "List" }],
+    otp: { type: String, default: '' },
+    lists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'List' }],
     // default list is user's Watch list
-    defaultList: { type: mongoose.Schema.Types.ObjectId, ref: "List" }, // Id of user's default list,
+    defaultList: { type: mongoose.Schema.Types.ObjectId, ref: 'List' }, // Id of user's default list,
     isDeleted: {
       type: Boolean,
       default: false,
@@ -27,8 +27,9 @@ const UserSchema = new mongoose.Schema(
       cardNumber: String,
       expiryDate: String,
       cvc: String,
-      billingAddress: String
-    }
+      billingAddress: String,
+      nameOnCard: String,
+    },
   },
   { timestamps: true }
 );
@@ -41,4 +42,4 @@ const UserSchema = new mongoose.Schema(
 //   next();
 // });
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model('User', UserSchema);

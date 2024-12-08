@@ -1,17 +1,17 @@
-import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import "../../Assets/css/styles.scss";
-import { addClassNames } from "../../store/utils/functions";
-import styles from "./register.module.scss";
-import { Link } from "react-router-dom";
+import { Box } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import '../../Assets/css/styles.scss';
+import { addClassNames } from '../../store/utils/functions';
+import styles from './register.module.scss';
+import { Link } from 'react-router-dom';
 
 const api_url = import.meta.env.VITE_APP_API_URL;
 
 enum STEP {
   SIGNUP,
-  BILLING
+  BILLING,
 }
 
 const Register = () => {
@@ -20,112 +20,126 @@ const Register = () => {
   const [step, setStep] = useState(STEP.SIGNUP);
 
   // sign up
-  const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [repeatPasswordError, setRepeatPasswordError] = useState("");
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [repeatPasswordError, setRepeatPasswordError] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
 
   // billing
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [cardNumberError, setCardNumberError] = useState("");
-  const [expiryDateError, setExpiryDateError] = useState("");
-  const [cvcError, setCvcError] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [billingAddressError, setBillingAddressError] = useState("");
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [cvc, setCvc] = useState('');
+  const [cardNumberError, setCardNumberError] = useState('');
+  const [expiryDateError, setExpiryDateError] = useState('');
+  const [cvcError, setCvcError] = useState('');
+  const [billingAddress, setBillingAddress] = useState('');
+  const [nameOnCard, setNameOnCard] = useState('');
+  const [nameOnCardError, setNameOnCardError] = useState('');
+  const [billingAddressError, setBillingAddressError] = useState('');
 
   // Validators
 
   const validateUsername = (value) => {
     if (!value) {
-      setUsernameError("Username is required");
+      setUsernameError('Username is required');
     } else if (value.length < 6) {
-      setUsernameError("Username must be at least 6 characters long");
+      setUsernameError('Username must be at least 6 characters long');
     } else {
-      setUsernameError("");
+      setUsernameError('');
     }
   };
 
   const validateEmail = (value) => {
     if (!value) {
-      setEmailError("Email address is required");
+      setEmailError('Email address is required');
     } else if (!/^\S+@\S+\.\S+$/.test(value)) {
-      setEmailError("Invalid email address");
+      setEmailError('Invalid email address');
     } else {
-      setEmailError("");
+      setEmailError('');
     }
   };
 
   const validatePassword = (value) => {
     if (!value) {
-      setPasswordError("Password is required");
+      setPasswordError('Password is required');
     } else if (value.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
+      setPasswordError('Password must be at least 6 characters long');
     } else {
-      setPasswordError("");
+      setPasswordError('');
     }
   };
 
   const validateRepeatPassword = (value) => {
     if (!value) {
-      setRepeatPasswordError("Repeat Password is required");
+      setRepeatPasswordError('Repeat Password is required');
     } else if (value !== password) {
-      setRepeatPasswordError("Passwords do not match");
+      setRepeatPasswordError('Passwords do not match');
     } else {
-      setRepeatPasswordError("");
+      setRepeatPasswordError('');
     }
   };
 
   const validateCardNumber = (cardNumber: string) => {
     if (!cardNumber) {
-      setCardNumberError("Card Number is required");
+      setCardNumberError('Card Number is required');
     } else if (cardNumber.length !== 19) {
-      setCardNumberError("Card Number is invalid");
+      setCardNumberError('Card Number is invalid');
     } else {
-      setCardNumberError("");
+      setCardNumberError('');
     }
-  }
+  };
 
   const validateExpiryDate = (expiryDate: string) => {
     if (!expiryDate) {
-      setExpiryDateError("Expiry date is required");
-    } if (expiryDate.length !== 5) {
-      setExpiryDateError("Expiry date is invalid");
+      setExpiryDateError('Expiry date is required');
+    }
+    if (expiryDate.length !== 5) {
+      setExpiryDateError('Expiry date is invalid');
     } else {
-      const [month, year] = expiryDate.split("/").map((item) => parseInt(item, 10));
-      if ((month < 1) || (month > 12)) {
-        setExpiryDateError("Expiry date is invalid");
+      const [month, year] = expiryDate
+        .split('/')
+        .map((item) => parseInt(item, 10));
+      if (month < 1 || month > 12) {
+        setExpiryDateError('Expiry date is invalid');
       } else if (new Date(year + 2000, month, 1) < new Date()) {
-        setExpiryDateError("Expiry date is expired");
+        setExpiryDateError('Expiry date is expired');
       } else {
-        setExpiryDateError("");
+        setExpiryDateError('');
       }
     }
-  }
+  };
 
   const validateCvc = (cvc: string) => {
     if (!cvc) {
-      setCvcError("CVC is required");
-    } if (cvc.length !== 3) {
-      setCvcError("CVC is invalid");
-    } else {
-      setCvcError("");
+      setCvcError('CVC is required');
     }
-  }
+    if (cvc.length !== 3) {
+      setCvcError('CVC is invalid');
+    } else {
+      setCvcError('');
+    }
+  };
+
+  const validateNameOnCard = (nameOnCard: string) => {
+    if (!nameOnCard) {
+      setNameOnCard('Name On Card is required');
+    } else {
+      setNameOnCardError('');
+    }
+  };
 
   const validateBillingAddress = (address: string) => {
     if (!address) {
-      setBillingAddressError("Billing address is required");
+      setBillingAddressError('Billing address is required');
     } else {
-      setBillingAddressError("");
+      setBillingAddressError('');
     }
-  }
+  };
 
   useEffect(() => {
     setIsFormValid(
@@ -159,7 +173,9 @@ const Register = () => {
     validateRepeatPassword(value);
   };
 
-  const handleCardNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCardNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value
       .replace(/[\D]+/g, '')
       .replace(/(.{4})/g, '$1 ')
@@ -167,59 +183,72 @@ const Register = () => {
       .slice(0, 19);
     setCardNumber(value);
     validateCardNumber(value);
-  }
+  };
 
-  const handleExpiryDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExpiryDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value
       .replace(/[\D]+/g, '')
       .replace(/(.{2})(.+)/, '$1/$2')
       .slice(0, 5);
     setExpiryDate(value);
     validateExpiryDate(value);
-  }
+  };
 
   const handleCvcChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.replace(/[\D]+/g, '').slice(0, 3);
     setCvc(value);
     validateCvc(value);
-  }
+  };
 
-  const handleBillingAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameOnCardChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value?.trim();
+    setNameOnCard(value);
+    validateNameOnCard(value);
+  };
+
+  const handleBillingAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value;
     setBillingAddress(value);
     validateBillingAddress(value);
-  }
+  };
 
   const handleSignUp = () => {
     if (!email || !password) {
       validateEmail(email);
       validatePassword(password);
-      validateRepeatPassword("");
-      validateUsername("");
+      validateRepeatPassword('');
+      validateUsername('');
       return;
     }
 
-    localStorage.setItem("haniemail", email);
-    localStorage.setItem("hanipassword", password);
-    localStorage.setItem("haniusername", username);
+    localStorage.setItem('haniemail', email);
+    localStorage.setItem('hanipassword', password);
+    localStorage.setItem('haniusername', username);
 
     setStep(STEP.BILLING);
-  }
+  };
 
   const handleBilling = () => {
-    if (!cardNumber || !expiryDate || !cvc) {
+    if (!cardNumber || !expiryDate || !cvc || !nameOnCard) {
       validateCardNumber(cardNumber);
       validateExpiryDate(expiryDate);
       validateCvc(cvc);
+      validateNameOnCard(nameOnCard);
       return;
     }
 
-    fetch(api_url + "auth/register", {
-      method: "POST",
+    fetch(api_url + 'auth/register', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      mode: "cors",
+      mode: 'cors',
       body: JSON.stringify({
         email,
         username,
@@ -227,10 +256,11 @@ const Register = () => {
         cardNumber,
         expiryDate,
         cvc,
-        billingAddress
+        billingAddress,
+        nameOnCard,
       }),
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(({ success, statusText }) => {
         if (success) {
           // Proceed with subscription flow if both email and username are available
@@ -238,102 +268,99 @@ const Register = () => {
         } else {
           // Handle the error case
           Swal.fire({
-            title: "Error",
+            title: 'Error',
             text: statusText,
-            icon: "error",
+            icon: 'error',
           });
         }
       })
       .catch((e) => {
         console.log(e);
         Swal.fire({
-          title: "Error",
-          text: e.statusText || "An unexpected error occurred",
-          icon: "error",
+          title: 'Error',
+          text: e.statusText || 'An unexpected error occurred',
+          icon: 'error',
         });
       });
-  }
+  };
 
   const signUpForm = (
     <>
-      <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
+      <h2 className='text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text'>
         Sign Up
       </h2>
-      <div style={{ maxWidth: "450px", width: "100%" }}>
-        <div className={styles["OutWrapper"]}>
-          <div className={styles["inputWrapper"]}>
+      <div style={{ maxWidth: '450px', width: '100%' }}>
+        <div className={styles['OutWrapper']}>
+          <div className={styles['inputWrapper']}>
             <input
-              type="text"
-              placeholder="Username"
-              id="username"
-              name="username"
+              type='text'
+              placeholder='Username'
+              id='username'
+              name='username'
               onChange={handleUsernameChange}
               value={username}
             />
           </div>
-          <small className="text-[red]">{usernameError}</small>
+          <small className='text-[red]'>{usernameError}</small>
         </div>
-        <div className={styles["OutWrapper"]}>
-          <div className={styles["inputWrapper"]}>
+        <div className={styles['OutWrapper']}>
+          <div className={styles['inputWrapper']}>
             <input
-              type="email"
-              placeholder="Email address"
-              id="email"
-              name="email"
+              type='email'
+              placeholder='Email address'
+              id='email'
+              name='email'
               onChange={handleEmailChange}
               value={email}
             />
           </div>
-          <small className="text-[red]">{emailError}</small>
+          <small className='text-[red]'>{emailError}</small>
         </div>
-        <div className={styles["OutWrapper"]}>
-          <div className={styles["inputWrapper"]}>
+        <div className={styles['OutWrapper']}>
+          <div className={styles['inputWrapper']}>
             <input
-              type="password"
-              placeholder="Password"
-              id="password"
-              name="password"
+              type='password'
+              placeholder='Password'
+              id='password'
+              name='password'
               onChange={handlePasswordChange}
               value={password}
             />
           </div>
-          <small className="text-[red]">{passwordError}</small>
+          <small className='text-[red]'>{passwordError}</small>
         </div>
-        <div className={styles["OutWrapper"]}>
-          <div className={styles["inputWrapper"]}>
+        <div className={styles['OutWrapper']}>
+          <div className={styles['inputWrapper']}>
             <input
-              type="password"
-              placeholder="Repeat Password"
-              id="repeat-password"
-              name="repeat-password"
+              type='password'
+              placeholder='Repeat Password'
+              id='repeat-password'
+              name='repeat-password'
               onChange={handleRepeatPassword}
               value={repeatPassword}
             />
           </div>
-          <small className="text-[red]">
-            {repeatPasswordError}
-          </small>
+          <small className='text-[red]'>{repeatPasswordError}</small>
         </div>
-        <div className="flex items-center justify-center">
+        <div className='flex items-center justify-center'>
           <button
-            type="submit"
-            className={styles["btn"]}
+            type='submit'
+            className={styles['btn']}
             style={{
               borderColor: '#14f59e',
               background: '#14f59e1f',
               color: '#14f59e',
             }}
             onClick={handleSignUp}
-            disabled={!isFormValid}
-          >
+            disabled={!isFormValid}>
             <p>Continue</p>
           </button>
         </div>
-        <div className="text-white text-md text-center">
-          <span>Already have an account?{" "}</span>
+        <div className='text-white text-md text-center'>
+          <span>Already have an account? </span>
           <span>
-            <Link className={styles["link"]} to="/login">
-              {" "}
+            <Link className={styles['link']} to='/login'>
+              {' '}
               Sign in
             </Link>
           </span>
@@ -343,104 +370,124 @@ const Register = () => {
   );
 
   const billing = (
-    <div className="max-w-[400px]">
-      <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text">
+    <div className='max-w-[400px]'>
+      <h2 className='text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text'>
         Billing
       </h2>
-      <div className={styles["OutWrapper"]}>
-        <div className={styles["inputWrapper"]}>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
           <input
-            type="text"
-            placeholder="Card Number"
-            id="cardNumber"
-            name="cardNumber"
+            type='text'
+            placeholder='Card Number'
+            id='cardNumber'
+            name='cardNumber'
             value={cardNumber}
             onChange={handleCardNumberChange}
           />
         </div>
-        <small className="text-[red]">{cardNumberError}</small>
+        <small className='text-[red]'>{cardNumberError}</small>
       </div>
-      <div className={styles["OutWrapper"]}>
-        <div className={styles["inputWrapper"]}>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
           <input
-            type="text"
-            placeholder="Expiry Date"
-            id="expiryDate"
-            name="expiryDate"
+            type='text'
+            placeholder='Expiry Date'
+            id='expiryDate'
+            name='expiryDate'
             value={expiryDate}
             onChange={handleExpiryDateChange}
           />
         </div>
-        <small className="text-[red]">{expiryDateError}</small>
+        <small className='text-[red]'>{expiryDateError}</small>
       </div>
-      <div className={styles["OutWrapper"]}>
-        <div className={styles["inputWrapper"]}>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
           <input
-            type="text"
-            placeholder="CVC"
-            id="cvc"
-            name="cvc"
+            type='text'
+            placeholder='CVC'
+            id='cvc'
+            name='cvc'
             value={cvc}
             onChange={handleCvcChange}
           />
         </div>
-        <small className="text-[red]">{cvcError}</small>
+        <small className='text-[red]'>{cvcError}</small>
       </div>
-      <div className={styles["OutWrapper"]}>
-        <div className={styles["inputWrapper"]}>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
           <input
-            type="text"
-            placeholder="Billing Address"
-            id="billingAddress"
-            name="billingAddress"
+            type='text'
+            placeholder='Name On Card'
+            id='nameOnCard'
+            name='nameOnCard'
+            value={nameOnCard}
+            onChange={handleNameOnCardChange}
+          />
+        </div>
+        <small className='text-[red]'>{nameOnCardError}</small>
+      </div>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
+          <input
+            type='text'
+            placeholder='Billing Address'
+            id='billingAddress'
+            name='billingAddress'
             value={billingAddress}
             onChange={handleBillingAddressChange}
           />
         </div>
-        <small className="text-[red]">{billingAddressError}</small>
+        <small className='text-[red]'>{billingAddressError}</small>
       </div>
-      <div className="flex items-center justify-center">
+      <div className='flex items-center justify-center'>
         <button
-          className={styles["btn"]}
+          className={styles['btn']}
           style={{
             borderColor: '#14f59e',
             background: '#14f59e1f',
             color: '#14f59e',
           }}
           onClick={handleBilling}
-          disabled={!!(cardNumberError || expiryDateError || cvcError || billingAddressError)}
-        >
+          disabled={
+            !!(
+              cardNumberError ||
+              expiryDateError ||
+              cvcError ||
+              billingAddressError ||
+              nameOnCardError
+            )
+          }>
           <p>Subscribe</p>
         </button>
       </div>
-      <div className="text-white w-full">
-        You will not be charged for 30 days. Cancel anytime without any hidden fees.
-        <img className="m-auto mt-2 w-full" src="/images/AMEX EXPRESS.png" width="200" />
+      <div className='text-white w-full'>
+        You will not be charged for 30 days. Cancel anytime without any hidden
+        fees.
+        <img
+          className='m-auto mt-2 w-full'
+          src='/images/AMEX EXPRESS.png'
+          width='200'
+        />
       </div>
     </div>
   );
 
   return (
-    <div className={addClassNames(styles["loginNew"])}>
-      <Box
-        className={addClassNames(styles["top"], "ml-[40px] mr-[40px]")}
-      >
+    <div className={addClassNames(styles['loginNew'])}>
+      <Box className={addClassNames(styles['top'], 'ml-[40px] mr-[40px]')}>
         <div
           className={addClassNames(
-            styles["wrapper"],
-            "flex items-center justify-between"
-          )}
-        >
+            styles['wrapper'],
+            'flex items-center justify-between'
+          )}>
           <a
-            href={"/"}
-            style={{ textDecoration: "none" }}
-            className={styles["link"]}
-          >
+            href={'/'}
+            style={{ textDecoration: 'none' }}
+            className={styles['link']}>
             <h1>
               <span
-                style={{ fontWeight: "700", fontSize: "20px" }}
-                className="gradient-text"
-              >
+                style={{ fontWeight: '700', fontSize: '20px' }}
+                className='gradient-text'>
                 HANIFLIX
               </span>
             </h1>
@@ -448,9 +495,9 @@ const Register = () => {
         </div>
       </Box>
 
-      <div className={styles["section"]}>
-        <div className={styles["intro-section"]}>
-          {(step === STEP.SIGNUP) ? signUpForm : billing}
+      <div className={styles['section']}>
+        <div className={styles['intro-section']}>
+          {step === STEP.SIGNUP ? signUpForm : billing}
         </div>
       </div>
     </div>
