@@ -295,7 +295,7 @@ async function scrapeSingleMovieDetails({ _page, url }) {
 
   try {
     if (!_page) {
-      page = await browser.newPage();
+      page = await browser?.newPage();
       await page.setExtraHTTPHeaders({
         "Accept-Language": "en-US,en;q=0.9",
       });
@@ -344,7 +344,7 @@ async function scrapeSingleMovieDetails({ _page, url }) {
     return {};
   } finally {
     if (!_page) {
-      await page.close();
+      await page?.close();
     }
     if (browserInitializedLocally) {
       await closeBrowser();
