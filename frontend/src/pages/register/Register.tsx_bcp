@@ -37,18 +37,11 @@ const Register = () => {
   const [cardNumberError, setCardNumberError] = useState('');
   const [expiryDateError, setExpiryDateError] = useState('');
   const [cvcError, setCvcError] = useState('');
+  const [billingAddress, setBillingAddress] = useState('');
   const [nameOnCard, setNameOnCard] = useState('');
   const [nameOnCardError, setNameOnCardError] = useState('');
-  const [country, setCountry] = useState('');
-  const [countryError, setCountryError] = useState('');
-  const [addressLine, setAddressLine] = useState('');
-  const [addressLineError, setAddressLineError] = useState('');
-  const [city, setCity] = useState('');
-  const [cityError, setCityError] = useState('');
-  const [province, setProvince] = useState('');
-  const [provinceError, setProvinceError] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [zipCodeError, setZipCodeError] = useState('');
+  const [billingAddressError, setBillingAddressError] = useState('');
+
   // Validators
 
   const validateUsername = (value) => {
@@ -134,52 +127,19 @@ const Register = () => {
 
   const validateNameOnCard = (nameOnCard: string) => {
     if (!nameOnCard) {
-      setNameOnCard('Name On Card is required');
+      setNameOnCardError('Name On Card is required');
     } else {
       setNameOnCardError('');
     }
   };
 
-  const validateCountry = (country: string) => {
-    if (!country) {
-      setCountryError('Country is required');
+  const validateBillingAddress = (address: string) => {
+    if (!address) {
+      setBillingAddressError('Billing address is required');
     } else {
-      setCountryError('');
+      setBillingAddressError('');
     }
   };
-
-  const validateCity = (city: string) => {
-    if (!city) {
-      setCityError('City is required');
-    } else {
-      setCityError('');
-    }
-  };
-
-  const validateAddressLine = (addressLine: string) => {
-    if (!addressLine) {
-      setAddressLineError('Address Line is required');
-    } else {
-      setAddressLineError('');
-    }
-  };
-
-  const validateProvince = (province: string) => {
-    if (!province) {
-      setProvinceError('State/Province is required');
-    } else {
-      setProvinceError('');
-    }
-  };
-
-  const validateZipCode = (zipCode: string) => {
-    if (!zipCode) {
-      setZipCodeError('Zip Code/Postal Code is required');
-    } else {
-      setZipCodeError('');
-    }
-  };
-
 
   useEffect(() => {
     setIsFormValid(
@@ -250,38 +210,13 @@ const Register = () => {
     validateNameOnCard(value);
   };
 
-  const handleCountryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setCountry(value);
-    validateCountry(value);
-  };
-
-  const handleAddressLineChange = (
+  const handleBillingAddressChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
-    setAddressLine(value);
-    validateAddressLine(value);
+    setBillingAddress(value);
+    validateBillingAddress(value);
   };
-
-  const handleCityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setCity(value);
-    validateCity(value);
-  };
-
-  const handleProvinceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setProvince(value);
-    validateProvince(value);
-  };
-
-  const handleZipCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setZipCode(value);
-    validateZipCode(value);
-  };
-
 
   const handleSignUp = () => {
     if (!email || !password) {
@@ -297,6 +232,18 @@ const Register = () => {
     localStorage.setItem('haniusername', username);
 
     setStep(STEP.BILLING);
+  };
+
+  const handleBillingKeyDown = (event) => {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      handleBilling();
+    }
+  };
+
+  const handleSignUpKeyDown = (event) => {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      handleSignUp();
+    }
   };
 
   const handleBilling = () => {
@@ -321,11 +268,7 @@ const Register = () => {
         cardNumber,
         expiryDate,
         cvc,
-        country,
-        addressLine,
-        city,
-        zipCode,
-        province,
+        billingAddress,
         nameOnCard,
       }),
     })
@@ -368,6 +311,7 @@ const Register = () => {
               name='username'
               onChange={handleUsernameChange}
               value={username}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{usernameError}</small>
@@ -381,6 +325,7 @@ const Register = () => {
               name='email'
               onChange={handleEmailChange}
               value={email}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{emailError}</small>
@@ -394,6 +339,7 @@ const Register = () => {
               name='password'
               onChange={handlePasswordChange}
               value={password}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{passwordError}</small>
@@ -407,13 +353,14 @@ const Register = () => {
               name='repeat-password'
               onChange={handleRepeatPassword}
               value={repeatPassword}
+              onKeyDown={handleSignUpKeyDown}
             />
           </div>
           <small className='text-[red]'>{repeatPasswordError}</small>
         </div>
         <div className='flex items-center justify-center'>
           <button
-            type='submit'
+            type="button"
             className={styles['btn']}
             style={{
               borderColor: '#14f59e',
@@ -421,8 +368,14 @@ const Register = () => {
               color: '#14f59e',
             }}
             onClick={handleSignUp}
-            disabled={!isFormValid}>
-            <p>Continue</p>
+            disabled={!isFormValid}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleSignUp();
+              }
+            }}
+            >
+            Continue
           </button>
         </div>
         <div className='text-white text-md text-center'>
@@ -440,8 +393,8 @@ const Register = () => {
 
   const billing = (
     <div className='max-w-[400px]'>
-      <h2 className='text-white font-[500] text-[36px] m-[auto] w-[fit-content] gradient-text'>
-        Payment Information
+      <h2 className='text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text'>
+        Billing
       </h2>
       <div className={styles['OutWrapper']}>
         <div className={styles['inputWrapper']}>
@@ -452,6 +405,7 @@ const Register = () => {
             name='cardNumber'
             value={cardNumber}
             onChange={handleCardNumberChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{cardNumberError}</small>
@@ -465,6 +419,7 @@ const Register = () => {
             name='expiryDate'
             value={expiryDate}
             onChange={handleExpiryDateChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{expiryDateError}</small>
@@ -478,6 +433,7 @@ const Register = () => {
             name='cvc'
             value={cvc}
             onChange={handleCvcChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{cvcError}</small>
@@ -491,6 +447,7 @@ const Register = () => {
             name='nameOnCard'
             value={nameOnCard}
             onChange={handleNameOnCardChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
         <small className='text-[red]'>{nameOnCardError}</small>
@@ -499,66 +456,15 @@ const Register = () => {
         <div className={styles['inputWrapper']}>
           <input
             type='text'
-            placeholder='Country'
-            id='country'
-            name='country'
-            value={country}
-            onChange={handleCountryChange}
+            placeholder='Billing Address'
+            id='billingAddress'
+            name='billingAddress'
+            value={billingAddress}
+            onChange={handleBillingAddressChange}
+            onKeyDown={handleBillingKeyDown}
           />
         </div>
-        <small className='text-[red]'>{countryError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='Address Line'
-            id='addressLine'
-            name='addressLine'
-            value={addressLine}
-            onChange={handleAddressLineChange}
-          />
-        </div>
-        <small className='text-[red]'>{addressLineError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='City'
-            id='city'
-            name='city'
-            value={city}
-            onChange={handleCityChange}
-          />
-        </div>
-        <small className='text-[red]'>{cityError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='State/Province'
-            id='province'
-            name='province'
-            value={province}
-            onChange={handleProvinceChange}
-          />
-        </div>
-        <small className='text-[red]'>{provinceError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='Zip Code/Postal Code'
-            id='zipCode'
-            name='zipCode'
-            value={zipCode}
-            onChange={handleZipCodeChange}
-          />
-        </div>
-        <small className='text-[red]'>{zipCodeError}</small>
+        <small className='text-[red]'>{billingAddressError}</small>
       </div>
       <div className='flex items-center justify-center'>
         <button
@@ -574,12 +480,8 @@ const Register = () => {
               cardNumberError ||
               expiryDateError ||
               cvcError ||
-              countryError ||
-              nameOnCardError ||
-              addressLineError ||
-              cityError ||
-              zipCodeError ||
-              provinceError
+              billingAddressError ||
+              nameOnCardError
             )
           }>
           <p>Subscribe</p>

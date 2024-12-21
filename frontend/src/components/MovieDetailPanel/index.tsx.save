@@ -83,7 +83,8 @@ export default function MovieDetailPanel({
     //  showSwal("Added to list", '', 'success')
   };
 
-  const checkAndUpdateIframeSrc = (src) => {
+
+const checkAndUpdateIframeSrc = (src) {
     if (src) {
         if (!src.includes("youtube.com/embed/")) {
             let videoId = src.split("youtu.be/")[1].split("?")[0];
@@ -91,7 +92,7 @@ export default function MovieDetailPanel({
         }        
     }
     return src;
-  }
+}
 
   const renderActionButtons = () => {
     //like buttons
@@ -242,7 +243,7 @@ export default function MovieDetailPanel({
       style={{ height: "40em" }}
     >
       <iframe
-        src={checkAndUpdateIframeSrc(movieToShow?.imgTitle)}
+        src={movieToShow?.imgTitle}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
       ></iframe>
       <p className="text-base ">{movieToShow?.title}</p>

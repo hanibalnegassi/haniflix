@@ -5,13 +5,12 @@
     @media (max-width: 768px) {
         background: url("/images/mbhome.jpg");
         background-size: cover;
-        overflow: overlay;
-        height: auto;
-        background-attachment: fixed;
+        overflow: hidden;
+        height: 100%;
+        background-position: center center;        
         padding: 80px 20px;
     }
 
-    background-attachment: fixed !important;
     background-color: #0E061E;
     color: white;
     height: auto;

@@ -30,7 +30,9 @@ const TermsPage = () => {
             </button>
           </div>
         </Box>
-        <div className="container p-2 mt-2" id="termsServicePage">
+        <div className="container p-2 mt-2" id="termsServicePage" style={{
+                height:'100%'
+              }}>
           <h2 className="text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text" >
             Terms Of Service
           </h2>
