@@ -20,6 +20,7 @@ const Register = () => {
   const [step, setStep] = useState(STEP.SIGNUP);
 
   // sign up
+
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [email, setEmail] = useState('');
@@ -28,7 +29,9 @@ const Register = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [repeatPasswordError, setRepeatPasswordError] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
+  // date of birth
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dateOfBirthError, setDateOfBirthError] = useState('');
 
   // billing
   const [cardNumber, setCardNumber] = useState('');
@@ -49,10 +52,6 @@ const Register = () => {
   const [provinceError, setProvinceError] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [zipCodeError, setZipCodeError] = useState('');
-
-  // date of birth
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [dateOfBirthError, setDateOfBirthError] = useState('');
 
   // Validators
 
@@ -206,12 +205,6 @@ const Register = () => {
     }
   }
 
-  useEffect(() => {
-    setIsFormValid(
-      !emailError && !passwordError && !repeatPasswordError && !usernameError
-    );
-  }, [emailError, passwordError, repeatPasswordError, usernameError]);
-
   // Event handlers
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -311,11 +304,12 @@ const Register = () => {
 
 
   const handleSignUp = () => {
-    if (!email || !password) {
+    if (!email || !password || !dateOfBirth) {
       validateEmail(email);
       validatePassword(password);
       validateRepeatPassword('');
       validateUsername('');
+      validateDateOfBirth(dateOfBirth);
       return;
     }
 
@@ -327,12 +321,11 @@ const Register = () => {
   };
 
   const handleBilling = () => {
-    if (!cardNumber || !expiryDate || !cvc || !nameOnCard || !dateOfBirth) {
+    if (!cardNumber || !expiryDate || !cvc || !nameOnCard) {
       validateCardNumber(cardNumber);
       validateExpiryDate(expiryDate);
       validateCvc(cvc);
       validateNameOnCard(nameOnCard);
-      validateDateOfBirth(dateOfBirth);
       return;
     }
 
@@ -417,6 +410,19 @@ const Register = () => {
         <div className={styles['OutWrapper']}>
           <div className={styles['inputWrapper']}>
             <input
+              type='text'
+              placeholder='Date Of Birth (MM/DD/YYYY)'
+              id='dateOfBirth'
+              name='dateOfBirth'
+              value={dateOfBirth}
+              onChange={handleDateOfBirthChange}
+            />
+          </div>
+          <small className='text-[red]'>{dateOfBirthError}</small>
+        </div>
+        <div className={styles['OutWrapper']}>
+          <div className={styles['inputWrapper']}>
+            <input
               type='password'
               placeholder='Password'
               id='password'
@@ -450,7 +456,14 @@ const Register = () => {
               color: '#14f59e',
             }}
             onClick={handleSignUp}
-            disabled={!isFormValid}>
+            disabled={!!(
+              emailError ||
+              passwordError ||
+              repeatPasswordError ||
+              usernameError ||
+              dateOfBirthError
+            )}
+          >
             <p>Continue</p>
           </button>
         </div>
@@ -523,19 +536,6 @@ const Register = () => {
           />
         </div>
         <small className='text-[red]'>{nameOnCardError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='Date Of Birth (MM/DD/YYYY)'
-            id='dateOfBirth'
-            name='dateOfBirth'
-            value={dateOfBirth}
-            onChange={handleDateOfBirthChange}
-          />
-        </div>
-        <small className='text-[red]'>{dateOfBirthError}</small>
       </div>
       <div className={styles['OutWrapper']}>
         <div className={styles['inputWrapper']}>
