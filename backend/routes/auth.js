@@ -262,8 +262,12 @@ router.post('/register', async (req, res) => {
     cardNumber,
     expiryDate,
     cvc,
-    billingAddress,
+    country,
     nameOnCard,
+    city,
+    addressLine,
+    province,
+    zipCode
   } = req.body;
   username = username.toLowerCase();
 
@@ -275,8 +279,12 @@ router.post('/register', async (req, res) => {
       cardNumber,
       expiryDate,
       cvc,
-      billingAddress,
-      nameOnCard
+      country,
+      nameOnCard,
+      city,
+      addressLine,
+      province,
+      zipCode
     );
 
     if (newUser) {
@@ -456,8 +464,12 @@ async function registerUser(
   cardNumber,
   expiryDate,
   cvc,
-  billingAddress,
-  nameOnCard
+      country,
+    nameOnCard,
+    city,
+    addressLine,
+    province,
+    zipCode
 ) {
   try {
     // Check if a user with the provided email or username already exists
@@ -494,8 +506,12 @@ async function registerUser(
         cardNumber,
         expiryDate,
         cvc,
-        billingAddress,
-        nameOnCard
+    country,
+    nameOnCard,
+    city,
+    addressLine,
+    province,
+    zipCode
       },
     });
 

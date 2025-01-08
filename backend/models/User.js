@@ -27,8 +27,12 @@ const UserSchema = new mongoose.Schema(
       cardNumber: String,
       expiryDate: String,
       cvc: String,
-      billingAddress: String,
-      nameOnCard: String,
+    country: String,
+    nameOnCard: String,
+    city: String,
+    addressLine: String,
+    province: String,
+    zipCode: String
     },
   },
   { timestamps: true }

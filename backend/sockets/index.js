@@ -96,9 +96,6 @@ const setupSocket = (io) => {
         console.error("Error updating progress:", error);
       }
     });
-    socket.on("disconnect", () => {
-      socket.off("updateMovieProgress", handleUpdateMovieProgress);
-    });
   });
 };
 
