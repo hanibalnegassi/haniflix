@@ -1,5 +1,4 @@
 const ContinueWatchingList = require("../models/ContinueWatchingList");
-
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
@@ -32,15 +31,23 @@ const decodeAndVerifyToken = async (socket, next) => {
 };
 
 const checkLoginElsewhere = async (socket) => {
-  //token from frontend
   const token = socket.handshake.headers.token;
 
-  const decoded = jwt.verify(token, process.env.SECRET_KEY);
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const user = await User.findById(decoded.id);
 
-  const user = await User.findById(decoded.id);
+    if (!user) {
+      return socket.emit("forceLogout", "User not found");
+    }
 
-  if (token !== user.accessToken) {
-    socket.emit("forceLogout", "Logged in from another location");
+    // Only check token mismatch if user exists
+    if (token !== user.accessToken) {
+      socket.emit("forceLogout", "Logged in from another location");
+    }
+  } catch (error) {
+    console.error("Error checking login status:", error);
+    socket.emit("forceLogout", "Invalid token or login issue");
   }
 };
 
@@ -52,27 +59,27 @@ const setupSocket = (io) => {
   });
 
   io.on("connection", (socket) => {
-    //after connection check
+    // Check if the user is logged in elsewhere once per connection
     checkLoginElsewhere(socket);
 
     socket.on("updateMovieProgress", async (data) => {
       const { movieId, watchedPercentage, userId } = data;
 
-      // check every progress update
-      checkLoginElsewhere(socket);
-
       try {
+        // Avoid calling checkLoginElsewhere here, as it's already checked on connection
         if (watchedPercentage > 97) {
           // If watchedPercentage is above 97%, remove the entry
           const continueWatchingList = await ContinueWatchingList.findOne({
             user: userId,
           });
 
-          let newContent = [...continueWatchingList.content];
-          newContent = newContent.filter((_movieId) => _movieId != movieId);
+          if (continueWatchingList) {
+            let newContent = [...continueWatchingList.content];
+            newContent = newContent.filter((_movieId) => _movieId != movieId);
 
-          continueWatchingList.content = newContent;
-          await continueWatchingList.save();
+            continueWatchingList.content = newContent;
+            await continueWatchingList.save();
+          }
         } else {
           // Find or create the user's ContinueWatchingList document
           const continueWatchingList =
@@ -84,8 +91,6 @@ const setupSocket = (io) => {
               },
               { upsert: true, new: true }
             );
-
-          // console.log("find or update ", continueWatchingList);
         }
       } catch (error) {
         console.error("Error updating progress:", error);

@@ -143,7 +143,7 @@ const List: React.FC<ListProps> = ({
             }
             itemClass={addClassNames(
               // "!w-[120px] sm:!w-[11vw]",
-              `p-2 carousel-item`
+              `py-2 pr-2 carousel-item`
             )}
           >
             {list?.content?.map((movieId, i) => {

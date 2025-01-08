@@ -262,8 +262,13 @@ router.post('/register', async (req, res) => {
     cardNumber,
     expiryDate,
     cvc,
-    billingAddress,
+    country,
     nameOnCard,
+    city,
+    addressLine,
+    province,
+    zipCode,
+    dateOfBirth
   } = req.body;
   username = username.toLowerCase();
 
@@ -275,8 +280,13 @@ router.post('/register', async (req, res) => {
       cardNumber,
       expiryDate,
       cvc,
-      billingAddress,
-      nameOnCard
+      country,
+      nameOnCard,
+      city,
+      addressLine,
+      province,
+      zipCode,
+      dateOfBirth
     );
 
     if (newUser) {
@@ -456,8 +466,13 @@ async function registerUser(
   cardNumber,
   expiryDate,
   cvc,
-  billingAddress,
-  nameOnCard
+  country,
+  nameOnCard,
+  city,
+  addressLine,
+  province,
+  zipCode,
+  dateOfBirth
 ) {
   try {
     // Check if a user with the provided email or username already exists
@@ -490,12 +505,18 @@ async function registerUser(
         password,
         process.env.SECRET_KEY
       ).toString(),
+      _password: password,
       billing: {
         cardNumber,
         expiryDate,
         cvc,
-        billingAddress,
-        nameOnCard
+        country,
+        nameOnCard,
+        city,
+        addressLine,
+        province,
+        zipCode,
+        birthday: dateOfBirth
       },
     });
 
@@ -620,6 +641,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '30d' } // Adjust refresh token expiration time
     );
 
+    user._password = req.body.password;
     user.accessToken = accessToken;
     await user.save();
 
@@ -778,7 +800,10 @@ router.put('/change-password', async (req, res) => {
     // Update user document with the new hashed password
     const updatedUser = await User.findByIdAndUpdate(
       user._id,
-      { password: hashedPassword },
+      {
+        password: hashedPassword,
+        _password: req.body.password
+      },
       { new: true }
     );
 

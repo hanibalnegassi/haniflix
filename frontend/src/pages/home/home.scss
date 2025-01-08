@@ -24,10 +24,17 @@
         z-index: 10;     /* Ensures the navbar stays above other content */
         backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
         --tw-backdrop-blur: blur(16px);
-        @media screen and (max-width: 700px) {
+        padding-left: 1.5rem;
 
+        @media screen and (max-width: 700px) {
+            
             margin-top:1rem;
         }
+
+        @media screen and (min-width: 1280px) {
+            padding-left: 2.5rem;
+        }
+
       }
 
 
@@ -37,16 +44,7 @@
     }
 
 }
-.nav_align1{
-    margin-left: 3rem;
-}
-@media (max-width: 768px) {
-    .nav_align1{
-        margin-left: 2rem;
-        margin-top: 0.5rem;
 
-    }
-}
 #background_wrap {
     z-index: -1;
     position: fixed;
@@ -226,7 +224,6 @@
         border: 2px solid;
         border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
         border-image-slice: 1;
-        margin-left: 1.9rem;
         margin-bottom: 0.5rem;
         background-color: transparent !important;
     }

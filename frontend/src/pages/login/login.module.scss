@@ -11,14 +11,16 @@
 
   background-attachment: fixed;
   background-color: #0E061E;
-  color: white;
   height: 100%;
+
+  color: white;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0px 20px;
   overflow: hidden !important;
+
   position: relative;
 
   @media (max-width: 768px) {
@@ -82,6 +84,7 @@
   .section {
     box-sizing: border-box;
     height: 100vh;
+
     width: 100%;
     // background-color: #FFFFFF1A;
     border-bottom: solid 1px #555;
