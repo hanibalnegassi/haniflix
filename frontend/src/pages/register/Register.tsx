@@ -49,6 +49,11 @@ const Register = () => {
   const [provinceError, setProvinceError] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [zipCodeError, setZipCodeError] = useState('');
+
+  // date of birth
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dateOfBirthError, setDateOfBirthError] = useState('');
+
   // Validators
 
   const validateUsername = (value) => {
@@ -180,6 +185,26 @@ const Register = () => {
     }
   };
 
+  const validateDateOfBirth = (birth: string) => {
+    if (!birth) {
+      setDateOfBirthError("Date Of Birth is required");
+    } else {
+      const value = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(birth);
+      if (value === null) {
+        setDateOfBirthError("Date Of Birth is invalid");
+      } else {
+        const month = parseInt(value[1]);
+        const date = parseInt(value[2]);
+        const year = parseInt(value[3]);
+
+        if ((month < 0) || (month > 12) || (date < 0) || (date > 31) || (year < 1900)) {
+          setDateOfBirthError("Date Of Birth is invalid");
+        } else {
+          setDateOfBirthError("");
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     setIsFormValid(
@@ -213,9 +238,7 @@ const Register = () => {
     validateRepeatPassword(value);
   };
 
-  const handleCardNumberChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCardNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
       .replace(/[\D]+/g, '')
       .replace(/(.{4})/g, '$1 ')
@@ -225,9 +248,7 @@ const Register = () => {
     validateCardNumber(value);
   };
 
-  const handleExpiryDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleExpiryDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
       .replace(/[\D]+/g, '')
       .replace(/(.{2})(.+)/, '$1/$2')
@@ -282,6 +303,12 @@ const Register = () => {
     validateZipCode(value);
   };
 
+  const handleDateOfBirthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value?.replace(/[^\d\/]/, '');
+    setDateOfBirth(value);
+    validateDateOfBirth(value);
+  }
+
 
   const handleSignUp = () => {
     if (!email || !password) {
@@ -300,11 +327,12 @@ const Register = () => {
   };
 
   const handleBilling = () => {
-    if (!cardNumber || !expiryDate || !cvc || !nameOnCard) {
+    if (!cardNumber || !expiryDate || !cvc || !nameOnCard || !dateOfBirth) {
       validateCardNumber(cardNumber);
       validateExpiryDate(expiryDate);
       validateCvc(cvc);
       validateNameOnCard(nameOnCard);
+      validateDateOfBirth(dateOfBirth);
       return;
     }
 
@@ -327,6 +355,7 @@ const Register = () => {
         zipCode,
         province,
         nameOnCard,
+        dateOfBirth
       }),
     })
       .then((res) => res.json())
@@ -499,6 +528,19 @@ const Register = () => {
         <div className={styles['inputWrapper']}>
           <input
             type='text'
+            placeholder='Date Of Birth (MM/DD/YYYY)'
+            id='dateOfBirth'
+            name='dateOfBirth'
+            value={dateOfBirth}
+            onChange={handleDateOfBirthChange}
+          />
+        </div>
+        <small className='text-[red]'>{dateOfBirthError}</small>
+      </div>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
+          <input
+            type='text'
             placeholder='Country'
             id='country'
             name='country'
@@ -579,7 +621,8 @@ const Register = () => {
               addressLineError ||
               cityError ||
               zipCodeError ||
-              provinceError
+              provinceError ||
+              dateOfBirthError
             )
           }>
           <p>Subscribe</p>
