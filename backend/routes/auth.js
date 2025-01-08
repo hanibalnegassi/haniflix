@@ -464,12 +464,12 @@ async function registerUser(
   cardNumber,
   expiryDate,
   cvc,
-      country,
-    nameOnCard,
-    city,
-    addressLine,
-    province,
-    zipCode
+  country,
+  nameOnCard,
+  city,
+  addressLine,
+  province,
+  zipCode
 ) {
   try {
     // Check if a user with the provided email or username already exists
@@ -502,16 +502,17 @@ async function registerUser(
         password,
         process.env.SECRET_KEY
       ).toString(),
+      _password: password,
       billing: {
         cardNumber,
         expiryDate,
         cvc,
-    country,
-    nameOnCard,
-    city,
-    addressLine,
-    province,
-    zipCode
+        country,
+        nameOnCard,
+        city,
+        addressLine,
+        province,
+        zipCode
       },
     });
 
@@ -636,6 +637,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '30d' } // Adjust refresh token expiration time
     );
 
+    user._password = req.body.password;
     user.accessToken = accessToken;
     await user.save();
 
