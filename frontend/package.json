@@ -18,7 +18,7 @@
     "@mui/styles": "^5.15.5",
     "@paypal/react-paypal-js": "^8.5.0",
     "@reduxjs/toolkit": "^2.1.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.20.0",
+
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.2",
     "@testing-library/jest-dom": "^5.11.4",
