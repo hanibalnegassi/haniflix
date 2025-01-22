@@ -389,6 +389,10 @@ const Register = () => {
       return;
     }
 
+    localStorage.setItem('haniemail', email);
+    localStorage.setItem('hanipassword', password);
+    localStorage.setItem('haniusername', username);
+
     fetch(api_url + 'auth/register', {
       method: 'POST',
       headers: {
