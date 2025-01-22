@@ -1,0 +1,27 @@
+.yahoo-input-wrap{
+    position: relative;
+    font-size: 14px;
+}
+.yahoo-input{
+    display: block;
+    width: 100%;
+    padding-block: 0.65rem;
+    border-bottom: 1px solid #c5c5c5;
+}
+.yahoo-input:focus{
+    border-bottom-color: #7d2eff;
+}
+.yahoo-input-label{
+    pointer-events: none;
+    position: absolute;
+    transition: all 0.3s ease;
+    top: 12px;
+    color: #656565;
+}
+
+.yahoo-input:focus ~ .yahoo-input-label,
+.yahoo-input:not(:placeholder-shown) ~ .yahoo-input-label{
+    top: -10px;
+    transform: scale(0.9) translateX(-5px);
+    color: #333333;
+}

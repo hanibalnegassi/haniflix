@@ -18,7 +18,7 @@
     "@mui/styles": "^5.15.5",
     "@paypal/react-paypal-js": "^8.5.0",
     "@reduxjs/toolkit": "^2.1.0",
-    "@rollup/rollup-linux-x64-gnu": "^4.20.0",
+
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.2",
     "@testing-library/jest-dom": "^5.11.4",
@@ -51,6 +51,7 @@
     "react-spinners": "^0.13.8",
     "react-youtube": "^10.1.0",
     "redux-persist": "^6.0.0",
+    "rollup": "^4.31.0",
     "sass": "^1.35.1",
     "socket.io-client": "^4.7.4",
     "sweetalert2": "^11.6.13",

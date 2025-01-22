@@ -1,0 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+input.google-input[type="email"],
+input.google-input[type="password"],
+input.google-input[type="text"] {
+  display: block;
+  border: 1px solid rgb(228, 228, 228);
+  font-size: 16px;
+  width: 100%;
+  height: 55px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+  background-color: transparent;
+  outline: none;
+  border-radius: 5px;
+}
+
+.inputs {
+  position: relative;
+}
+
+.input-label.google-input {
+  position: absolute;
+  top: 15px;
+  font-size: 1.1rem;
+  left: 14px;
+  color: rgb(122, 122, 122);
+  font-weight: 100;
+  transition: 0.1s ease;
+  background-color: white;
+  padding: 0 5px;
+}
+.input-label.text-sm.google-input{
+  top: 18px;
+}
+
+input.google-input[type="email"]:focus ~ .input-label,
+input.google-input[type="email"]:not(:placeholder-shown) ~ .input-label,
+input.google-input[type="password"]:focus ~ .input-label,
+input.google-input[type="password"]:not(:placeholder-shown) ~ .input-label,
+input.google-input[type="text"]:focus ~ .input-label,
+input.google-input[type="text"]:not(:placeholder-shown) ~ .input-label {
+  top: -7px;
+  color: #1864c9;
+  font-size: 13px;
+  background-color: rgb(255, 255, 255);
+  z-index: 2;
+}

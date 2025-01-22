@@ -93,6 +93,36 @@
   }
 
   button {
+    // height: 55px;
+    // width: 100%;
+    // margin-top: 68px;
+    // margin: 5px auto 10px auto;
+    // border-radius: 5px;
+    // background-color: transparent;
+    // border: 2px solid;
+    // border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
+    // border-image-slice: 1;
+    // color: #ffffff;
+    // // border: none;
+    // font-size: 18px;
+    // font-weight: 500;
+    // cursor: pointer;
+
+    &:not(.no-style) {
+      /* General styles for styled buttons */
+    }
+  
+    &.no-style {
+      /* Reset for buttons with the no-style class */
+      all: unset;
+      background-color: transparent;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+      cursor: auto;
+    }
+  }
+  .stylebtn{
     height: 55px;
     width: 100%;
     margin-top: 68px;
@@ -108,9 +138,228 @@
     font-weight: 500;
     cursor: pointer;
   }
+.no-style{
+  all: unset;
+}
+
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 3px 3px;
+  border: none;
+  border-radius: 2px;
+  background-color: #4285f4;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  &:hover {
+      background-color: #357ae8;
+  }
+
+  .google-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      margin-right: 10px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      margin-left: 10px;
+      background-color: white;
+      align-items: center;
+      justify-content: center;
+    
+  }
+}
+
+.yahoo-button {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 3px 3px;
+  border: none;
+  
+  border-radius: 3px;
+  background-color: #5f01d1;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  &:hover {
+      background-color: #3a0082;
+  }
+
+  .yahoo-icon {
+      width: 34px;
+      height: 28px;
+      margin-left: 10px;
+      margin-top: 10px;
+  }
+}
+
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  background: white;
+  // padding: 30px;
+  border-radius: 8px;
+  position: relative;
+  width: 450px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .close-button {
+      position: absolute;
+      top: -12px;
+      color: black;
+      // right: 10px;
+      left: 200px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+  }
+
+  .popup-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+
+      .provider-logo {
+          width: 40px;
+          height: 40px;
+          margin-right: 15px;
+      }
+
+      h3 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: bold;
+      }
+  }
+
+  .input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+
+      &:focus {
+          border-color: #430091;
+          outline: none;
+      }
+  }
+
+  .password-input {
+      position: relative;
+  }
+
+  .toggle-password {
+      position: absolute;
+      left: 350px;
+      top: 25px;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+  }
+
+  .next-button {
+      width: 100%;
+      padding: 12px;
+      background-color: #430091;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+
+      &:hover {
+          background-color: #3a0082;
+      }
+  }
+
+  .error {
+      color: red;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+  }
+}
+
+.aol-button {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 3px 3px;
+  border: none;
+  border-radius: 3px;
+  background-color: whitesmoke;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  &:hover {
+      background-color: rgb(184, 184, 184);
+      color: whitesmoke ;
+  }
+
+  .aol-icon {
+      width: 28px;
+      height: 28px;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-top: 10px;
+  }
+}
+
+.outlook-button {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 3px 3px;
+  border: none;
+  border-radius: 3px;
+  background-color: #007bcb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  &:hover {
+      background-color: #0264a5;
+  }
+
+  .outlook-icon {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 10px;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 10px;
+  }
+}
 
   span {
-    color: lightgray;
+    // color: lightgray;
 
     b {
       color: white;
