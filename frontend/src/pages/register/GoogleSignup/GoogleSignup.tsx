@@ -28,9 +28,7 @@ const GoogleSignup: React.FC = ({ errors, email, setEmail, password, setPassword
               {errors && errors.email && (
                 <div className="text-xs text-google-error mt-[-5px] mb-2">{errors.email}</div>
               )}
-              <a href="#" className="block text-google-blue mb-[40px]">
-                Forgot Email?
-              </a>
+              
               {/* <p className="color">
                 Not your computer? Use Guest mode to sign in privately.
               </p>
@@ -38,8 +36,8 @@ const GoogleSignup: React.FC = ({ errors, email, setEmail, password, setPassword
                 Learn More
               </a> */}
             </div>
-            <div className="flex items-center justify-between text-sm leading-4 pl-2 pr-6 mb-[100px]">
-              <button className="text-google-blue hover:bg-google-blue-100 py-3 px-6 rounded-full">Create account</button>
+            <div className="flex items-center justify-between text-sm leading-4 pl-2 pr-6">
+              <div className="text-google-blue hover:bg-google-blue-100 py-3 px-6 rounded-full"></div>
               <button onClick={handleNext} className="text-white bg-google-blue py-3 px-6 rounded-full">Next</button>
             </div>
             <div className="p-5 text-xs flex items-center justify-between">
@@ -80,8 +78,7 @@ const GoogleSignup: React.FC = ({ errors, email, setEmail, password, setPassword
                 Learn More
               </a> */}
             </div>
-            <div className="flex items-center justify-between text-sm leading-4 pl-2 pr-6 mb-[100px]">
-              <button className="text-google-blue hover:bg-google-blue-100 py-3 px-6 rounded-full">Forgot password?</button>
+            <div className="flex items-center justify-between text-sm leading-4 pl-2 pr-6">
               <button onClick={handleNext} className="text-white bg-google-blue py-3 px-6 rounded-full">Sign in</button>
             </div>
             <div className="p-5 text-xs flex items-center justify-between">

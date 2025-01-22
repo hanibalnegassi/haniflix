@@ -73,6 +73,8 @@ const Register = () => {
   const [provinceError, setProvinceError] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [zipCodeError, setZipCodeError] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumberError, setPhoneNumberError] = useState('');
 
   // Validators
 
@@ -204,6 +206,13 @@ const Register = () => {
       setZipCodeError('');
     }
   };
+  const validatePhoneNumber = (phoneNumber: string) => {
+    if (!phoneNumber) {
+      setPhoneNumberError('Phone Number is required');
+    } else {
+      setPhoneNumberError('');
+    }
+  };
 
   const validateDateOfBirth = (birth: string) => {
     if (!birth) {
@@ -321,7 +330,11 @@ const Register = () => {
     setZipCode(value);
     validateZipCode(value);
   };
-
+  const handlePhoneNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setPhoneNumber(value);
+    validatePhoneNumber(value);
+  };
   const handleDateOfBirthChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value?.replace(/[^\d\/]/, '');
     setDateOfBirth(value);
@@ -358,7 +371,8 @@ const Register = () => {
       !addressLine ||
       !city ||
       !province ||
-      !zipCode
+      !zipCode||
+      !phoneNumber
     ) {
       validateUsername(username);
       validateCardNumber(cardNumber);
@@ -371,6 +385,7 @@ const Register = () => {
       validateCity(city);
       validateProvince(province);
       validateZipCode(zipCode);
+      validatePhoneNumber(phoneNumber)
       return;
     }
 
@@ -479,7 +494,7 @@ const togglePasswordVisibility = () => {
 
   const signUpForm = (
     <>
-        <h2 className='text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text'>Sign Up</h2>
+        <h2 className='text-white font-[500] text-[42px] m-[auto] w-[fit-content] gradient-text' style={{marginBottom: "-27px"}}>Sign Up</h2>
         <div className='mx-auto' style={{ maxWidth: '300px', width: '100%' }}>
             <div className={styles['OutWrapper']}>
                 <div className='flex flex-col gap-y-8 mt-12'>
@@ -883,9 +898,36 @@ const togglePasswordVisibility = () => {
         </div>
         <small className='text-[red]'>{zipCodeError}</small>
       </div>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
+          <input
+            type='text'
+            placeholder='Date Of Birth (MM/DD/YYYY)'
+            id='dateOfBirth'
+            name='dateOfBirth'
+            value={dateOfBirth}
+            onChange={handleDateOfBirthChange}
+          />
+        </div>
+        <small className='text-[red]'>{dateOfBirthError}</small>
+      </div>
+      <div className={styles['OutWrapper']}>
+        <div className={styles['inputWrapper']}>
+          <input
+            type='text'
+            placeholder='Phone Number'
+            id='PhoneNumber'
+            name='PhoneNumber'
+            value={phoneNumber}
+            onChange={handlePhoneNumberChange}
+          />
+        </div>
+        <small className='text-[red]'>{phoneNumberError}</small>
+      </div>
+      
       <div className='flex items-center justify-center'>
         <button
-          className={styles['btn']}
+          className={styles['stylebtn']}
           style={{
             borderColor: '#14f59e',
             background: '#14f59e1f',

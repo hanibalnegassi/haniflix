@@ -122,6 +122,22 @@
       cursor: auto;
     }
   }
+  .stylebtn{
+    height: 55px;
+    width: 100%;
+    margin-top: 68px;
+    margin: 5px auto 10px auto;
+    border-radius: 5px;
+    background-color: transparent;
+    border: 2px solid;
+    border-image-source: linear-gradient(94.55deg, #14FA9B -3.86%, #128EE9 100%);
+    border-image-slice: 1;
+    color: #ffffff;
+    // border: none;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+  }
 .no-style{
   all: unset;
 }

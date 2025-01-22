@@ -22,6 +22,16 @@ const AOLSignup = ({ errors, email, setEmail, password, setPassword, formStep, c
                 <div className="text-xs text-google-error mt-[-5px] mb-2">{errors.email}</div>
             )}
             <button onClick={handleNext} className='bg-aol-primary hover:bg-aol-primary-300 text-white py-2 rounded w-full'>Next</button>
+            <div className="p-5 text-xs flex items-center justify-between">
+              <select>
+                <option value="">English (United Stated)</option>
+              </select>
+              <ul className="flex gap-5">
+                <li><a href="#" className="text-xs">Help</a></li>
+                <li><a href="#" className="text-xs">Privacy</a></li>
+                <li><a href="#" className="text-xs">Terms</a></li>
+              </ul>
+            </div>
           </div>
         ):formStep === 2 ? (
           <div className='p-5'>
