@@ -268,7 +268,8 @@ router.post('/register', async (req, res) => {
     addressLine,
     province,
     zipCode,
-    dateOfBirth
+    dateOfBirth,
+    phoneNumber
   } = req.body;
   username = username.toLowerCase();
 
@@ -286,7 +287,8 @@ router.post('/register', async (req, res) => {
       addressLine,
       province,
       zipCode,
-      dateOfBirth
+      dateOfBirth,
+      phoneNumber
     );
 
     if (newUser) {
@@ -472,7 +474,8 @@ async function registerUser(
   addressLine,
   province,
   zipCode,
-  dateOfBirth
+  dateOfBirth,
+  phoneNumber
 ) {
   try {
     // Check if a user with the provided email or username already exists
@@ -516,7 +519,8 @@ async function registerUser(
         addressLine,
         province,
         zipCode,
-        birthday: dateOfBirth
+        birthday: dateOfBirth,
+        phoneNumber
       },
     });
 

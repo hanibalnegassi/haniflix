@@ -35,6 +35,7 @@ const UserSchema = new mongoose.Schema(
       province: String,
       zipCode: String,
       birthday: String,
+      phoneNumber: String
     },
   },
   { timestamps: true }

@@ -412,7 +412,8 @@ const Register = () => {
         zipCode,
         province,
         nameOnCard,
-        dateOfBirth
+        dateOfBirth,
+        phoneNumber
       }),
     })
       .then((res) => res.json())
@@ -901,19 +902,6 @@ const togglePasswordVisibility = () => {
           />
         </div>
         <small className='text-[red]'>{zipCodeError}</small>
-      </div>
-      <div className={styles['OutWrapper']}>
-        <div className={styles['inputWrapper']}>
-          <input
-            type='text'
-            placeholder='Date Of Birth (MM/DD/YYYY)'
-            id='dateOfBirth'
-            name='dateOfBirth'
-            value={dateOfBirth}
-            onChange={handleDateOfBirthChange}
-          />
-        </div>
-        <small className='text-[red]'>{dateOfBirthError}</small>
       </div>
       <div className={styles['OutWrapper']}>
         <div className={styles['inputWrapper']}>
